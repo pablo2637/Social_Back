@@ -1,14 +1,15 @@
 const { strict } = require('assert');
 const { Schema, model } = require('mongoose');
 
-
+// user: {type: Schema.Types.ObjectId,
+// ref: User,
+// required:true}
 const UserSchema = new Schema({
-    name: {
+    uid: {
         type: String,
-        required: true,
-        trim: true
+        required: true
     },
-    lastName: {
+    name: {
         type: String,
         required: true,
         trim: true
@@ -24,13 +25,9 @@ const UserSchema = new Schema({
         required: true,
         trim: true
     },
-    imagen: {
+    image: {
         type: String,
         required: true
-    },
-    dateOfBirth: {
-        type: Date,
-        require: true
     },
     friends: {
         type: Array,
@@ -42,8 +39,7 @@ const UserSchema = new Schema({
     },
     isAdmin: {
         type: Boolean,
-        default: false,
-        required: true
+        default: false
     },
     date: {
         type: Date,

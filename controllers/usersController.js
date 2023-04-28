@@ -1,6 +1,7 @@
 const User = require('../models/usersModel');
 const bcrypt = require('bcryptjs');
-const { uploadPic } = require('../helpers/uploadPic');
+const { uploadCloud } = require('../helpers/uploadCloud');
+const fs = require('fs').promises;
 
 
 const msgPass = 'Oculto por seguridad...';
@@ -40,32 +41,31 @@ const getUsers = async (req, res) => {
 
 
 
-const getUserByEmail = async ({ body }, res) => {
+const getUserByEmail = async ({ params }, res) => {
 
     try {
 
-        const user = await User.findOne({ "email": body.email });
+        const user = await User.findOne({ "email": params.email });
 
         if (!user)
             return res.status(403).json({
                 ok: false,
-                msg: `El email ${body.email} no esta registrado en la bbdd.`,
+                msg: `El email ${params.email} no esta registrado en la bbdd.`,
             });
 
         return res.status(200).json({
             ok: true,
             msg: 'Usuario encontrado con éxito',
             data: {
+                uid: user.uid,
                 id: user.id,
                 name: user.name,
-                lastName: user.lastName,
                 email: user.email,
-                imagen: user.imagen,
+                image: user.image,
                 friends: user.friends,
                 profile: user.profile,
                 theme: user.theme,
                 isAdmin: user.isAdmin,
-                dateOfBirth: user.dateOfBirth,
                 date: user.date
             }
         });
@@ -84,12 +84,11 @@ const getUserByEmail = async ({ body }, res) => {
 
 
 
-
-const createUser = async ({ body }, res) => {
+const createUser = async (req, res) => {
 
     try {
 
-        body.dateOfBirth = new Date(body.dateOfBirth);
+        const body = new Object(req.body);
 
         const yaExiste = await User.findOne({ "email": body.email });
 
@@ -100,25 +99,36 @@ const createUser = async ({ body }, res) => {
             });
 
 
+        let urlPic;
+        if (req.file)
+            urlPic = await uploadCloud(`./public/${req.file.filename}`, body.uid);
+
+        else
+            urlPic = await uploadCloud(body.image, body.uid);
+
+
+
+        body.image = urlPic;
         const user = new User(body);
         const salt = bcrypt.genSaltSync(10);
 
         user.password = bcrypt.hashSync(body.password, salt);
 
+
         await user.save();
 
-
-        // uploadPic(body.imagen, user.id);
+        if (req.file)
+            await fs.unlink(`./public/${req.file.filename}`);
 
 
         return res.status(201).json({
             ok: true,
             msg: 'Usuario creado con éxito',
             data: {
+                uid: user.uid,
                 id: user.id,
                 name: user.name,
-                lastName: user.lastName,
-                imagen: user.imagen,
+                image: user.image,
                 email: user.email
             }
         });
@@ -142,16 +152,14 @@ const updateUser = async ({ body }, res) => {
 
     try {
 
-        let { id, name, lastName, password, imagen, dateOfBirth } = body;
-
-        dateOfBirth = new Date(dateOfBirth);
+        let { id, name, lastName, password, imagen } = body;
 
         const salt = bcrypt.genSaltSync(10);
         password = bcrypt.hashSync(password, salt);
 
 
         const user = await User.findByIdAndUpdate(id,
-            { name, lastName, password, imagen, dateOfBirth }, { new: true });
+            { name, password, imagen }, { new: true });
 
         if (!user)
             return res.status(400).json({
@@ -163,10 +171,10 @@ const updateUser = async ({ body }, res) => {
             ok: true,
             msg: 'Usuario actualizado con éxito',
             data: {
+                uid: user.uid,
                 id: user.id,
                 name: user.name,
-                lastName: user.lastName,
-                imagen: user.imagen,
+                image: user.image,
                 email: user.email
             }
         });
@@ -205,10 +213,10 @@ const updateUsersFriends = async ({ body }, res) => {
             ok: true,
             msg: 'Usuario actualizado con éxito',
             data: {
+                uid: user.uid,
                 id: user.id,
                 name: user.name,
-                lastName: user.lastName,
-                imagen: user.imagen,
+                image: user.image,
                 email: user.email,
                 friends: user.friends
             }

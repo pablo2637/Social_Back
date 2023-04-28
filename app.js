@@ -1,10 +1,13 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 require('dotenv').config();
+
 const { connect } = require('./helpers/dbConnect');
 
 port = process.env.PORT;
 
+app.use(cors());                                    //Cors
 app.use(express.static(__dirname + '/public'));     //Carpeta static
 
 app.use(express.urlencoded({ extended: false }));   // Parse application/x-www-form-urlencoded
@@ -22,4 +25,7 @@ app.use((req, res) => { res.status(404).send({ msg: `Ruta no encontrada: ${req.u
 
 
 //Listener
-app.listen(port, () => console.log(`Server listenning on port ${port}...`));
+app.listen(port, () => {   
+    console.log(`Server listenning on port ${port}...`);
+}
+);

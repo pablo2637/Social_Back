@@ -37,6 +37,9 @@ const UserSchema = new Schema({
         type: Array,
         default: []
     },
+    profileOrder: {
+        type: Array,
+    },
     isAdmin: {
         type: Boolean,
         default: false

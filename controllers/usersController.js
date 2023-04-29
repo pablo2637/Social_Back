@@ -53,21 +53,12 @@ const getUserByEmail = async ({ params }, res) => {
                 msg: `El email ${params.email} no esta registrado en la bbdd.`,
             });
 
+
+        user.password = msgPass;
         return res.status(200).json({
             ok: true,
             msg: 'Usuario encontrado con éxito',
-            data: {
-                uid: user.uid,
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                image: user.image,
-                friends: user.friends,
-                profile: user.profile,
-                theme: user.theme,
-                isAdmin: user.isAdmin,
-                date: user.date
-            }
+            user
         });
 
     } catch (e) {
@@ -101,10 +92,10 @@ const createUser = async (req, res) => {
 
         let urlPic;
         if (req.file)
-            urlPic = await uploadCloud(`./public/${req.file.filename}`, body.uid);
+            urlPic = await uploadCloud(`./public/${req.file.filename}`, body.uid, 'Social');
 
         else
-            urlPic = await uploadCloud(body.image, body.uid);
+            urlPic = await uploadCloud(body.image, body.uid, 'Social');
 
 
 
@@ -121,16 +112,11 @@ const createUser = async (req, res) => {
             await fs.unlink(`./public/${req.file.filename}`);
 
 
+        user.password = msgPass;
         return res.status(201).json({
             ok: true,
             msg: 'Usuario creado con éxito',
-            data: {
-                uid: user.uid,
-                id: user.id,
-                name: user.name,
-                image: user.image,
-                email: user.email
-            }
+            user
         });
 
     } catch (e) {
@@ -152,13 +138,13 @@ const updateUser = async ({ body }, res) => {
 
     try {
 
-        let { id, name, lastName, password, imagen } = body;
+        let { _id, name, password, imagen } = body;
 
         const salt = bcrypt.genSaltSync(10);
         password = bcrypt.hashSync(password, salt);
 
 
-        const user = await User.findByIdAndUpdate(id,
+        const user = await User.findByIdAndUpdate(id_,
             { name, password, imagen }, { new: true });
 
         if (!user)
@@ -167,17 +153,13 @@ const updateUser = async ({ body }, res) => {
                 msg: `No existe ningún usuario con el ObjectId(${id})`
             });
 
+        user.password = msgPass;
         return res.status(201).json({
             ok: true,
             msg: 'Usuario actualizado con éxito',
-            data: {
-                uid: user.uid,
-                id: user.id,
-                name: user.name,
-                image: user.image,
-                email: user.email
-            }
+            user
         });
+
 
     } catch (e) {
         console.log('updateUser error:', e);
@@ -209,17 +191,11 @@ const updateUsersFriends = async ({ body }, res) => {
                 msg: `No existe ningún usuario con el ObjectId(${id})`
             });
 
+        user.password = msgPass;
         return res.status(201).json({
             ok: true,
             msg: 'Usuario actualizado con éxito',
-            data: {
-                uid: user.uid,
-                id: user.id,
-                name: user.name,
-                image: user.image,
-                email: user.email,
-                friends: user.friends
-            }
+            user
         });
 
     } catch (e) {
@@ -228,6 +204,102 @@ const updateUsersFriends = async ({ body }, res) => {
         return res.status(500).json({
             ok: false,
             msg: 'updateUsersFriends: Ha habido un fallo al modificar el usuario.',
+            error: e
+        });
+
+    };
+};
+
+
+const orderArray = (arrayOriginal, arrayOrder) => {
+
+    const newArray = [];
+
+    arrayOrder.forEach(el => {
+        console.log('el', el)
+        newArray.push(arrayOriginal.find(elAO => elAO.id == el));
+    });
+
+    return newArray;
+}
+
+
+
+const updateUsersProfile = async (req, res) => {
+
+    try {
+
+        // console.log('req files', req.files)
+        // console.log('req body', req.body)
+        const body = new Object(req.body);
+        const { _id, uid, profileOrder, ...profile } = body;
+
+        let newProfile = [];
+        const newProfileOrder = profileOrder.split(',');
+
+        console.log('profile', profile)
+        for (const key in profile) {
+            const tempKey = key.split('-');
+            newProfile.push({
+                content: profile[key],
+                typeInput: tempKey[0],
+                id: key,
+                name: key
+            });
+        }
+
+
+        let urlPic;
+        const arrayFiles = req.file || req.files;
+
+        if (arrayFiles)
+            for (let i = 0; i < arrayFiles.length; i++) {
+                urlPic = await uploadCloud(`./public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
+                newProfile.push({
+                    content: urlPic,
+                    typeInput: 'image',
+                    id: arrayFiles[i].fieldname,
+                    name: arrayFiles[i].fieldname
+                });
+            };
+
+
+        // console.log('newProfile before', newProfile);
+        newProfile = orderArray(newProfile, newProfileOrder);
+        // console.log('newProfile after', newProfile);
+
+
+        const update = { $set: { profile: newProfile, profileOrder: newProfileOrder } };
+        const response = await User.updateOne({ _id }, update, { new: true });
+
+        if (!response)
+            return res.status(400).json({
+                ok: false,
+                msg: `No existe ningún usuario con el ObjectId(${id})`
+            });
+
+
+        const user = await User.findById(_id);
+
+        if (arrayFiles) {
+            for (let i = 0; i < arrayFiles.length; i++) {
+                await fs.unlink(`./public/${arrayFiles[i].filename}`);
+            }
+        }
+
+        user.password = msgPass;
+        return res.status(201).json({
+            ok: true,
+            msg: 'Usuario actualizado con éxito',
+            user
+        });
+
+    } catch (e) {
+        console.log('updateUsersProfile error:', e);
+
+        return res.status(500).json({
+            ok: false,
+            msg: 'updateUsersProfile: Ha habido un fallo al modificar el usuario.',
             error: e
         });
 
@@ -288,11 +360,10 @@ const loginUser = async ({ body }, res) => {
             });
 
         user.password = msgPass;
-
         return res.status(200).json({
             ok: true,
             msg: 'Login correcto.',
-            data: user
+            user
         });
 
     } catch (e) {
@@ -313,6 +384,7 @@ module.exports = {
     getUserByEmail,
     updateUsersFriends,
     loginUser,
+    updateUsersProfile,
     updateUser,
     deleteUser,
     createUser

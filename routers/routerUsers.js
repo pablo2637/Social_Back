@@ -4,7 +4,7 @@ const router = express.Router();
 const { check } = require('express-validator');
 const { validateInputs } = require('../middlewares/validateInputs');
 
-const { upload } = require('../helpers/uploadImg')
+const { upload, uploadMulti } = require('../helpers/uploadImg')
 
 const {
     createUser,
@@ -13,7 +13,8 @@ const {
     updateUser,
     deleteUser,
     loginUser,
-    updateUsersFriends
+    updateUsersFriends,
+    updateUsersProfile
 } = require('../controllers/usersController');
 
 
@@ -22,6 +23,11 @@ router.get('/', getUsers);
 
 
 router.get('/email/:email', getUserByEmail);
+
+
+router.post('/profile', [
+    uploadMulti
+], updateUsersProfile);
 
 
 router.post('/', [

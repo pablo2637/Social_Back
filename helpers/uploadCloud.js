@@ -1,11 +1,11 @@
 const cloudinary = require('../configs/cloudinayConfig');
 
-const uploadCloud = async (urlPic, publicID) => {
+const uploadCloud = async (urlPic, publicID, newFolder) => {
 
     let res;
     try {
-
-        res = await cloudinary.uploader.upload(urlPic, { folder: 'Social', public_id: publicID })
+        console.log('urlPic', urlPic, 'publicID', publicID, 'newFolder', newFolder)
+        res = await cloudinary.uploader.upload(urlPic, { folder: newFolder, public_id: publicID })
 
     } catch (error) {
         console.log('error upload', error);

@@ -22,5 +22,15 @@ const upload = multer({
     }
 }).single('image');
 
+const uploadMulti = multer({
+    storage: storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5 // límite de tamaño de archivo
+    }
+}).any();
 
-module.exports = { upload };
+
+module.exports = {
+    upload,
+    uploadMulti
+};

@@ -25,14 +25,13 @@ router.get('/', getUsers);
 router.get('/email/:email', getUserByEmail);
 
 
-router.post('/profile', [
+router.put('/profile', [
     uploadMulti
 ], updateUsersProfile);
 
 
 router.post('/', [
-    // check('name', 'El nombre es obligatorio.').trim().notEmpty(),
-    // check('password', 'La contraseña es obligatoria y debe tener entre 5 y 10 caracteres.').trim().isLength({ min: 5, max: 10 }).notEmpty(),
+    // check('name', 'El nombre es obligatorio.').trim().notEmpty(),    
     // check('email', 'El email es obligatorio, por favor, verifícalo.').trim().isEmail(),
     // check('image', 'La imagen es obligatoria.').trim().notEmpty(),
     // validateInputs,    
@@ -42,8 +41,6 @@ router.post('/', [
 
 router.put('/', [
     // check('name', 'El nombre es obligatorio.').trim().notEmpty(),
-    // check('password', 'La contraseña es obligatoria y debe tener entre 5 y 10 caracteres.').trim().isLength({ min: 5, max: 10 }).notEmpty(),
-    // check('email', 'El email es obligatorio, por favor, verifícalo.').trim().isEmail(),
     // check('image', 'La imagen es obligatoria.').trim().notEmpty(),
     // validateInputs
     upload

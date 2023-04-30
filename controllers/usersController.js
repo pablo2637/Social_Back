@@ -98,7 +98,6 @@ const createUser = async (req, res) => {
             urlPic = await uploadCloud(body.image, body.uid, 'Social');
 
 
-
         body.image = urlPic;
         const user = new User(body);
         const salt = bcrypt.genSaltSync(10);
@@ -134,24 +133,36 @@ const createUser = async (req, res) => {
 
 
 
-const updateUser = async ({ body }, res) => {
+const updateUser = async (req, res) => {
 
     try {
 
-        let { _id, name, password, imagen } = body;
+        const body = new Object(req.body);
 
-        const salt = bcrypt.genSaltSync(10);
-        password = bcrypt.hashSync(password, salt);
+        let { _id, uid, name, image, imageURL } = body;
+
+        let urlPic;
+        if (req.file)
+            urlPic = await uploadCloud(`./public/${req.file.filename}`, uid, 'Social');
+
+        else
+            urlPic = await uploadCloud(imageURL, body.uid, 'Social');
 
 
-        const user = await User.findByIdAndUpdate(id_,
-            { name, password, imagen }, { new: true });
+        image = urlPic;
+        const user = await User.findByIdAndUpdate(_id,
+            { name, image }, { new: true });
 
         if (!user)
             return res.status(400).json({
                 ok: false,
                 msg: `No existe ningún usuario con el ObjectId(${id})`
             });
+
+
+        if (req.file)
+            await fs.unlink(`./public/${req.file.filename}`);
+
 
         user.password = msgPass;
         return res.status(201).json({
@@ -209,6 +220,7 @@ const updateUsersFriends = async ({ body }, res) => {
 
     };
 };
+
 
 
 const orderArray = (arrayOriginal, arrayOrder) => {

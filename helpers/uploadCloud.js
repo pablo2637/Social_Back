@@ -4,7 +4,7 @@ const uploadCloud = async (urlPic, publicID, newFolder) => {
 
     let res;
     try {
-        console.log('urlPic', urlPic, 'publicID', publicID, 'newFolder', newFolder)
+        // console.log('urlPic', urlPic, 'publicID', publicID, 'newFolder', newFolder)
         res = await cloudinary.uploader.upload(urlPic, { folder: newFolder, public_id: publicID })
 
     } catch (error) {

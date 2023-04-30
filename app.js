@@ -31,7 +31,10 @@ const io = new Server(server, {
 
 //Rutas
 app.use('/api/users', require('./routers/routerUsers'));    //Users
+app.use('/api/public', require('./routers/routerPublic'));    //Users
 
+
+//Chat server
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
 
@@ -41,7 +44,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("send_message", (data) => {
-        console.log('mensaje',data)
+        console.log('mensaje', data)
         socket.to(data.room).emit("receive_message", data);
     });
 

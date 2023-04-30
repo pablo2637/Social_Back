@@ -160,6 +160,10 @@ const updateUser = async (req, res) => {
             });
 
 
+        if (req.file)
+            await fs.unlink(`./public/${req.file.filename}`);
+
+
         user.password = msgPass;
         return res.status(201).json({
             ok: true,

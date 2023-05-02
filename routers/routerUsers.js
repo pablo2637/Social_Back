@@ -31,13 +31,21 @@ router.put('/profile', [
 ], updateUsersProfile);
 
 
+
+router.put('/friends', updateUsersFriends);
+
+
 router.post('/invite', createInvite);
+
 
 router.put('/invite', respondInvite);
 
+
 router.delete('/invite', deleteInvite);
 
+
 router.get('/invite', getInvites);
+
 
 
 router.post('/', [

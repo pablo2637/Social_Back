@@ -12,7 +12,7 @@ const deleteInvite = async ({ body }, res) => {
     try {
         console.log('body', body)
         const invite = await Invite.findByIdAndDelete(body._id);
-        console.log('invite',invite)
+        console.log('invite', invite)
         if (!invite)
             return res.status(400).json({
                 ok: false,
@@ -45,9 +45,10 @@ const getInvites = async (req, res) => {
         const invites = await Invite.find({ response: false });
 
         if (invites.length == 0)
-            return res.status(400).json({
-                ok: false,
-                msg: 'No hay invitaciones en la bbdd.'
+            return res.status(200).json({
+                ok: true,
+                msg: 'No hay invitaciones en la bbdd.',
+                data: []
             });
 
         return res.status(200).json({
@@ -168,9 +169,10 @@ const getUsers = async (req, res) => {
         const users = await User.find();
 
         if (users.length == 0)
-            return res.status(400).json({
-                ok: false,
-                msg: 'No hay usuarios en la bbdd.'
+            return res.status(200).json({
+                ok: true,
+                msg: 'No hay usuarios en la bbdd.',
+                data: []
             });
 
         users.map(user => user.password = msgPass);
@@ -344,16 +346,14 @@ const updateUsersFriends = async ({ body }, res) => {
 
     try {
 
-        const { id, friends } = body;
+        const { _id, friendID } = body;
 
-
-        const user = await User.findByIdAndUpdate(id,
-            { friends }, { new: true });
+        const user = await User.findByIdAndUpdate(_id, { $pull: { friends: friendID } }, { new: true });
 
         if (!user)
             return res.status(400).json({
                 ok: false,
-                msg: `No existe ningún usuario con el ObjectId(${id})`
+                msg: `No existe ningún usuario con el ObjectId(${_id})`
             });
 
         user.password = msgPass;

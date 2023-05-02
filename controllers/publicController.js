@@ -5,7 +5,7 @@ const getProfiles = async (req, res) => {
 
     try {
 
-        const profiles = await User.find({}, { name: 1, email: 1, profile: 1, profileOrder: 1 });
+        const profiles = await User.find({}, { name: 1, image: 1, email: 1, profile: 1, profileOrder: 1 });
 
         if (profiles.length == 0)
             return res.status(400).json({

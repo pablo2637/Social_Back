@@ -7,11 +7,12 @@ const { validateInputs } = require('../middlewares/validateInputs');
 const { upload, uploadMulti } = require('../helpers/uploadImg')
 
 const {
-    createUser,
-    getUsers,
-    getUserByEmail,
-    updateUser,
-    deleteUser,
+    createInvite, respondInvite, getInvites, deleteInvite,
+
+    createUser, updateUser, deleteUser,
+
+    getUsers, getUserByEmail,
+
     loginUser,
     updateUsersFriends,
     updateUsersProfile
@@ -28,6 +29,15 @@ router.get('/email/:email', getUserByEmail);
 router.put('/profile', [
     uploadMulti
 ], updateUsersProfile);
+
+
+router.post('/invite', createInvite);
+
+router.put('/invite', respondInvite);
+
+router.delete('/invite', deleteInvite);
+
+router.get('/invite', getInvites);
 
 
 router.post('/', [

@@ -33,25 +33,7 @@ const io = new Server(server, {
 app.use('/api/users', require('./routers/routerUsers'));    //Users
 app.use('/api/public', require('./routers/routerPublic'));    //Users
 
-
-//Chat server
-io.on("connection", (socket) => {
-    console.log(`User Connected: ${socket.id}`);
-
-    socket.on("join_room", (data) => {
-        socket.join(data);
-        console.log(`User with ID: ${socket.id} joined room: ${data}`);
-    });
-
-    socket.on("send_message", (data) => {
-        console.log('mensaje', data)
-        socket.to(data.room).emit("receive_message", data);
-    });
-
-    socket.on("disconnect", () => {
-        console.log("User Disconnected", socket.id);
-    });
-});
+const socketController = require('./controllers/socketController')(io);
 
 
 //404
@@ -61,4 +43,4 @@ app.use((req, res) => { res.status(404).send({ msg: `Ruta no encontrada: ${req.u
 //Listener
 app.listen(port, () => console.log(`AppServer listenning on port ${port}...`));
 
-server.listen(chatPort, () => console.log(`ChatServer listenning on port ${chatPort}...`))
+server.listen(chatPort, () => console.log(`ChatServer listenning on port ${chatPort}...`));

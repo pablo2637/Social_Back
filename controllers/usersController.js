@@ -1,10 +1,164 @@
 const User = require('../models/usersModel');
+const Invite = require('../models/invitesModel');
 const bcrypt = require('bcryptjs');
 const { uploadCloud } = require('../helpers/uploadCloud');
 const fs = require('fs').promises;
 
-
 const msgPass = 'Oculto por seguridad...';
+
+
+const deleteInvite = async ({ body }, res) => {
+
+    try {
+        console.log('body', body)
+        const invite = await Invite.findByIdAndDelete(body._id);
+        console.log('invite',invite)
+        if (!invite)
+            return res.status(400).json({
+                ok: false,
+                msg: `No existe ninguna invitación con el ObjectId(${body._id})`
+            });
+
+        return res.status(201).json({
+            ok: true,
+            msg: 'Invitación eliminada con éxito.'
+        });
+
+    } catch (e) {
+        console.log('deleteInvite error:', e);
+
+        return res.status(500).json({
+            ok: false,
+            msg: 'deleteInvite: Ha habido un fallo al eliminar la invitación.',
+            error: e
+        });
+
+    };
+};
+
+
+
+const getInvites = async (req, res) => {
+
+    try {
+
+        const invites = await Invite.find({ response: false });
+
+        if (invites.length == 0)
+            return res.status(400).json({
+                ok: false,
+                msg: 'No hay invitaciones en la bbdd.'
+            });
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Invitaciones recuperadas con éxito',
+            data: invites
+        });
+
+    } catch (e) {
+        console.log('getInvites error:', e);
+
+        return res.status(404).json({
+            ok: false,
+            msg: 'Error getInvites: fallo al intentar recuperar todos las invitaciones',
+            error: e
+        });
+
+    };
+};
+
+
+
+const createInvite = async ({ body }, res) => {
+
+    try {
+
+        const { sender, receiver } = body;
+
+        const yaExiste = await Invite.findOne({
+            "sender": sender,
+            "receiver": receiver,
+            "response": false
+        });
+
+        if (yaExiste)
+            return res.status(400).json({
+                ok: false,
+                msg: `No es posible enviar la invitación, porque ya hay una pendiente de respuesta`,
+            });
+
+
+        const invite = new Invite({ sender, receiver });
+
+        await invite.save();
+
+        return res.status(201).json({
+            ok: true,
+            msg: 'Invitación creada con éxito',
+            invite
+        });
+
+    } catch (e) {
+        console.log('incomingInvite error:', e);
+
+        return res.status(500).json({
+            ok: false,
+            msg: 'incomingInvite: Ha habido un fallo al crear la invitación.',
+            error: e
+        });
+
+    };
+}
+
+
+const respondInvite = async ({ body }, res) => {
+
+    try {
+
+        const response = true;
+        const { accept, _id, sender, receiver } = body;
+
+        const invite = await Invite.findByIdAndUpdate(_id,
+            { response, accept }, { new: true });
+
+        if (!invite)
+            return res.status(400).json({
+                ok: false,
+                msg: `No existe ninguna invitación con el ObjectId(${id})`
+            });
+
+        const friend1 = await User.findByIdAndUpdate(sender,
+            { $push: { friends: receiver } }, { new: true });
+
+        const friend2 = await User.findByIdAndUpdate(receiver,
+            { $push: { friends: sender } }, { new: true });
+
+        if (!friend1 || !friend2)
+            return res.status(400).json({
+                ok: false,
+                msg: `Error al agregar el amigo`
+            });
+
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Invitación actualizada con éxito',
+            invite
+        });
+
+    } catch (e) {
+        console.log('respondInvite error:', e);
+
+        return res.status(500).json({
+            ok: false,
+            msg: 'respondInvite: Ha habido un fallo al responder a la invitación.',
+            error: e
+        });
+
+    };
+}
+
 
 
 const getUsers = async (req, res) => {
@@ -165,7 +319,7 @@ const updateUser = async (req, res) => {
 
 
         user.password = msgPass;
-        return res.status(201).json({
+        return res.status(200).json({
             ok: true,
             msg: 'Usuario actualizado con éxito',
             user
@@ -392,6 +546,10 @@ const loginUser = async ({ body }, res) => {
 
 
 module.exports = {
+    createInvite,
+    respondInvite,
+    deleteInvite,
+    getInvites,
     getUsers,
     getUserByEmail,
     updateUsersFriends,

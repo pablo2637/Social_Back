@@ -3,6 +3,7 @@ const Invite = require('../models/invitesModel');
 const bcrypt = require('bcryptjs');
 const { uploadCloud } = require('../helpers/uploadCloud');
 const fs = require('fs').promises;
+const { execute } = require('./socketController')
 
 const msgPass = 'Oculto por seguridad...';
 
@@ -18,6 +19,12 @@ const deleteInvite = async ({ body }, res) => {
                 ok: false,
                 msg: `No existe ninguna invitación con el ObjectId(${body._id})`
             });
+
+        execute({
+            to: '-1',
+            command: 'reload_invites',
+            id: invite.sender
+        });
 
         return res.status(201).json({
             ok: true,
@@ -94,6 +101,11 @@ const createInvite = async ({ body }, res) => {
 
         await invite.save();
 
+        execute({
+            to: '1',
+            command: 'reload_invites',
+            id: receiver
+        });
         return res.status(201).json({
             ok: true,
             msg: 'Invitación creada con éxito',
@@ -142,6 +154,11 @@ const respondInvite = async ({ body }, res) => {
             });
 
 
+        execute({
+            to: '1',
+            command: 'reload_user-invites',
+            id: sender
+        });
         return res.status(200).json({
             ok: true,
             msg: 'Invitación actualizada con éxito',
@@ -267,6 +284,12 @@ const createUser = async (req, res) => {
             await fs.unlink(`./public/${req.file.filename}`);
 
 
+        execute({
+            to: '-1',
+            command: 'reload_profiles',
+            id: user._id
+        });
+
         user.password = msgPass;
         return res.status(201).json({
             ok: true,
@@ -319,6 +342,11 @@ const updateUser = async (req, res) => {
         if (req.file)
             await fs.unlink(`./public/${req.file.filename}`);
 
+        execute({
+            to: '-1',
+            command: 'reload_profiles',
+            id: _id
+        });
 
         user.password = msgPass;
         return res.status(200).json({
@@ -356,6 +384,13 @@ const updateUsersFriends = async ({ body }, res) => {
                 msg: `No existe ningún usuario con el ObjectId(${_id})`
             });
 
+
+        execute({
+            to: '1',
+            command: 'reload_user',
+            id: friendID
+        });
+
         user.password = msgPass;
         return res.status(201).json({
             ok: true,
@@ -382,12 +417,45 @@ const orderArray = (arrayOriginal, arrayOrder) => {
     const newArray = [];
 
     arrayOrder.forEach(el => {
-        console.log('el', el)
         newArray.push(arrayOriginal.find(elAO => elAO.id == el));
     });
 
     return newArray;
-}
+};
+
+
+const checkAttachsFiles = (attachs, profile) => {
+
+    const upload = [];
+    for (const [key, value] of Object.entries(profile)) {
+
+        if (key.includes('imageURL')) {
+
+            const tempImg = key.split('_');
+            const exists = attachs.find(att => att.fieldname == tempImg[0]);
+
+            if (!exists) {
+
+                profile[tempImg[0]] = value
+
+                const tempName = value.split('/');
+                upload.push({
+                    url: value,
+                    name: tempName[tempName.length - 1]
+                })
+            }
+
+            delete profile[key];
+        }
+    };
+
+    for (const key of Object.entries(profile)) {
+
+        if (key.includes('imageURL')) delete profile[key];
+    };
+
+    return { profile, upload };
+};
 
 
 
@@ -403,8 +471,15 @@ const updateUsersProfile = async (req, res) => {
         let newProfile = [];
         const newProfileOrder = profileOrder.split(',');
 
-        console.log('profile', profile)
-        for (const key in profile) {
+        const arrayFiles = req.files || [];
+
+        // console.log('newProfileOrder', newProfileOrder)
+        // console.log('profile', profile)
+
+        const { profile: arrayOK, upload } = checkAttachsFiles(arrayFiles, profile);
+        // console.log('arrayOK', arrayOK, 'upload', upload)
+
+        for (const key in arrayOK) {
             const tempKey = key.split('-');
             newProfile.push({
                 content: profile[key],
@@ -416,9 +491,8 @@ const updateUsersProfile = async (req, res) => {
 
 
         let urlPic;
-        const arrayFiles = req.file || req.files;
+        if (arrayFiles) {
 
-        if (arrayFiles)
             for (let i = 0; i < arrayFiles.length; i++) {
                 urlPic = await uploadCloud(`./public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
                 newProfile.push({
@@ -428,6 +502,11 @@ const updateUsersProfile = async (req, res) => {
                     name: arrayFiles[i].fieldname
                 });
             };
+        }
+
+        for (let i = 0; i < upload.length; i++) {
+            urlPic = await uploadCloud(upload[i].url, upload[i].name, `Social/${body.uid}`);
+        };
 
 
         // console.log('newProfile before', newProfile);
@@ -435,7 +514,7 @@ const updateUsersProfile = async (req, res) => {
         // console.log('newProfile after', newProfile);
 
 
-        const update = { $set: { profile: newProfile, profileOrder: newProfileOrder } };
+        const update = { $set: { profile: newProfile, profileOrder: newProfileOrder, dateMod: Date() } };
         const response = await User.updateOne({ _id }, update, { new: true });
 
         if (!response)
@@ -452,6 +531,12 @@ const updateUsersProfile = async (req, res) => {
                 await fs.unlink(`./public/${arrayFiles[i].filename}`);
             }
         }
+
+        execute({
+            to: '-1',
+            command: 'reload_profiles',
+            id: _id
+        });
 
         user.password = msgPass;
         return res.status(201).json({
@@ -485,6 +570,11 @@ const deleteUser = async ({ body }, res) => {
                 ok: false,
                 msg: `No existe ningún usuario con el ObjectId(${body.id})`
             });
+
+        execute({
+            to: 'all',
+            command: 'reload_profiles'
+        });
 
         return res.status(201).json({
             ok: true,

@@ -28,12 +28,16 @@ const io = new Server(server, {
         methods: ["GET", "POST"],
     },
 });
+module.exports = { io }
 
 //Rutas
 app.use('/api/users', require('./routers/routerUsers'));    //Users
-app.use('/api/public', require('./routers/routerPublic'));    //Users
+app.use('/api/public', require('./routers/routerPublic'));    //Profiles
+app.use('/api/socket', require('./routers/routerSocket'));    //Execute socket commands
 
-const socketController = require('./controllers/socketController')(io);
+
+const { socketController } = require('./controllers/socketController')
+socketController()
 
 
 //404

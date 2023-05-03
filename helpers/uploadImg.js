@@ -2,12 +2,13 @@ const multer = require('multer');
 
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function (req, file, cb) {        
         cb(null, './public/');
     },
     filename: function (req, file, cb) {
         console.log('filename', file.originalname)
         const extension = file.originalname.split('.');
+        console.log('exten',extension)
         const uniqueSuffix = `${Date.now()}.${extension[extension.length - 1]}`;
 
         cb(null, uniqueSuffix);

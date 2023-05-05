@@ -1,6 +1,43 @@
 const User = require('../models/usersModel');
 
+/**
+ * @author Pablo
+ * @exports Object
+ * @module publicController
+ */
 
+/**
+ * Definición del tipo Profile
+ * @typedef {Object} Profile
+ * @property {String} _id ID del usuario
+ * @property {String} uid ID generado por Firebase del usuario
+ * @property {String} name Nombre del usuario
+ * @property {String} email Email del usuario
+ * @property {String} image URL de la imagen del usuario
+ * @property {Array} profile Elementos de tipo ProfileElement, que componen el perfil
+ * @property {Array} profileOrder IDs de los elementos que conforman el perfil en un orden específico
+ */
+
+
+/**
+ * Definición del tipo ProfileElement
+ * @typedef {Object} ProfileElement
+ * @property {String} content El contenido del elemento (ej: url de la imagen o el value de un input)
+ * @property {String} typeInput Tipo de elemento (title, text, image, paragraph)
+ * @property {String} id ID del elemento
+ * @property {String} name Nombre del elemento
+ */
+
+
+/**
+* Devuelve todos los perfiles públicos de los usuarios.
+* @method getProfiles
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y data, que es un array de tipo Profile
+* @throws {json} Devuelve el error
+*/
 const getProfiles = async (req, res) => {
 
     try {

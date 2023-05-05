@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: socketController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: socketController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { io } = require('../app');
+const Chat = require('../models/chatsModel');
+
+const usersConnected = [];
+
+/**
+ * @namespace controllers
+ */
+
+/** 
+ * @author Pablo
+ * @exports Object 
+ * @module socketController
+ * @memberof controllers
+ */
+
+
+/**
+ * Definición del tipo Order
+ * @typedef {Object} Oder
+ * @property {String} command La orden a ejecutar (reload_profiles / reload_invites / reload_user / 
+ * reload_chats / reload_all)
+ * @property {String} to A quien debe emitirse la orden (1 / -1 / all)
+ * @property {String} [id] El ID del usuario al que enviar la orden o al que NO debe enviarse según
+ * se requiera
+ */
+
+
+/**
+* Devuelve el ID del socket.
+* @method getSocketID
+* @async
+* @param {String} socketID ID del usuario
+* @returns {json} Devuelve OK y socketID, que es ID del socket
+* @throws {json} Devuelve OK: false
+*/
+const getSocketID = (userID) => {
+
+    const id = usersConnected.find(soc => soc.userID == userID);
+    console.log('id', id)
+    if (!id)
+        return { ok: false }
+
+    return {
+        ok: true,
+        socketID: id.socketID
+    }
+
+};
+
+
+/**
+* Conjunto de métodos que procesan la información recibda a través del Chat Server
+* @method socketController
+* @requires module:app/io
+*/
+const socketController = () => {
+
+    io.on("connection", (socket) => {
+
+        usersConnected.push({
+            socketID: socket.id,
+            userID: ''
+        })
+
+
+        console.log('list beginning', usersConnected)
+
+
+        socket.on("connect", () => {
+
+            console.log('connect', usersConnected)
+        });
+
+
+
+        socket.on("byeBye", () => {
+
+            usersConnected.map(user => user.socketID == socket.id ? user.userID = '' : user.userID)
+
+            console.log('User logout', usersConnected)
+        });
+
+
+        socket.on("whoAmI", (data) => {
+
+            const receiver = getSocketID(data.userID);
+            if (receiver.ok) {
+                console.log('disconect double bitch', data.userID);
+                socket.disconnect();
+
+            } else {
+                const ind = usersConnected.findIndex(user => user.socketID == socket.id)
+
+                if (ind != -1) {
+                    usersConnected[ind].userID = data.userID;
+                    console.log('New user connected:', usersConnected);
+
+                } else
+                    console.log('error whoAmI');
+
+            }
+
+        });
+
+
+        socket.on("newChat", (data) => {
+            console.log('data', data)
+
+            if (!data) {
+                socket.emit('NoChatData', data);
+                return
+            }
+
+            socket.join(data.name);
+            console.log(`User with ID: ${socket.id} joined room: ${data.name}`);
+
+            const receiver = getSocketID(data.receiver);
+
+            if (receiver.ok)
+                socket(receiver.socketID).join(data.name);
+
+            createChat(data)
+        });
+
+
+        socket.on("send_message", (data) => {
+            console.log('mensaje', data)
+            socket.to(data.room).emit("receive_message", data);
+        });
+
+
+        socket.on("disconnect", () => {
+            console.log('disco', socket.id)
+            const ind = usersConnected.findIndex(user => user.socketID == socket.id)
+
+            if (ind != -1)
+                usersConnected.splice(ind, 1);
+        });
+
+
+        io.sockets.sockets.forEach(soc => {
+            console.log('list end socket', soc.id)
+        })
+
+
+    });
+
+
+};
+
+
+const createChat = async (data) => {
+
+    try {
+
+        let _id;
+        const yaExiste = await Chat.findOne({
+            $or: [
+                { "userSender": data.sender, "userReceiver": data.receiver },
+                { "userSender": data.receiver, "userReceiver": data.sender }
+            ]
+        });
+
+
+        if (yaExiste)
+            _id = yaExiste._id;
+
+        else {
+            const newChat = new Chat({
+                userSender: data.sender,
+                userReceiver: data.receiver,
+                chatName: data.name
+            });
+
+            const chat = await newChat.save();
+            if (!chat)
+                return {
+                    ok: false,
+                    msg: 'Error al crear chat',
+                    newChat
+                }
+
+            _id = chat._id;
+        }
+
+
+        return {
+            ok: true,
+            msg: 'Chat creado con éxito',
+            _id
+        };
+
+    } catch (e) {
+        console.log('createChat error:', e);
+
+        return {
+            ok: false,
+            msg: 'createChat: Ha habido un fallo al crear el chat.',
+            error: e
+        };
+
+    };
+
+
+}
+
+
+const saveChat = async (data) => {
+
+    try {
+
+        const { sender, receiver, _id, chat } = data;
+
+        // const yaExiste = await Chat.findOne({
+        //     $or: [
+        //         { "userSender": sender, "userReceiver": receiver },
+        //         { "userSender": receiver, "userReceiver": sender }
+        //     ]
+        // });
+
+
+        const response = await Chat.findByIdAndUpdate(_id,
+            { $push: { chats: chat } }, { new: true });
+
+        if (!response)
+            return {
+                ok: false,
+                response
+            }
+
+        return {
+            ok: true,
+            msg: 'Chat actualizado con éxito',
+            response
+        };
+
+    } catch (e) {
+        console.log('createUser error:', e);
+
+        return {
+            ok: false,
+            msg: 'createUser: Ha habido un fallo al crear el usuario.',
+            error: e
+        };
+
+    };
+
+
+}
+
+
+/**
+* Ejecuta una acción en todos los sockets conectados, en todos menos el que ha enviado la información o
+también en uno en concrecto. (ENDPOINT)
+* @method executeEP
+* @param {Object} req Es el requerimiento que proviene de las rutas, en el 
+body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, to, order e id &lt;optional>
+* @throws {json} Devuelve el error
+*/
+const executeEP = ({ body }, res) => {
+
+    const order = body;
+
+    if (order.to == 'all') {
+
+        io.emit('execute', order)
+
+    } else if (order.to == '-1') {
+
+        const list = usersConnected.filter(user => user.userID != order.id);
+
+        list.forEach(soc => {
+            io.to(soc.socketID).emit('execute', order)
+        });
+
+    } else if (order.to == '1') {
+
+        const response = getSocketID(body.id);
+
+        if (!response.ok)
+            res.status(500).json({
+                ok: false,
+                response
+            })
+
+        io.to(response.socketID).emit('execute', order)
+    }
+
+    res.status(200).json({
+        ok: true,
+        to: order.to,
+        order: order.command,
+        id: order.id
+    });
+
+};
+
+
+/**
+* Ejecuta una acción en todos los sockets conectados, en todos menos el que ha enviado la información o
+también en uno en concrecto.
+* @method execute
+* @param {Object} req Es el requerimiento que proviene de las rutas, en el 
+body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, to, order e id &lt;optional>
+* @throws {json} Devuelve el error
+*/
+const execute = (order) => {
+
+    if (order.to == 'all') {
+
+        io.emit('execute', order)
+
+    } else if (order.to == '-1') {
+
+        const list = usersConnected.filter(user => user.userID != order.id);
+        console.log('order', order)
+        console.log('list complete', usersConnected);
+        console.log('list', list)
+
+        list.forEach(soc => {
+            io.to(soc.socketID).emit('execute', order)
+        });
+
+    } else if (order.to == '1') {
+
+        const response = getSocketID(order.id);
+
+        if (!response.ok)
+            return response
+
+        io.to(response.socketID).emit('execute', order)
+    }
+
+
+    return {
+        ok: true,
+        to: order.to,
+        order: order.command,
+        id: order.id
+    };
+
+};
+
+module.exports = {
+    socketController,
+    saveChat,
+    createChat,
+    execute,
+    executeEP
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-publicController.html">publicController</a></li><li><a href="module-socketController.html">socketController</a></li><li><a href="module-usersController.html">usersController</a></li></ul><h3>Namespaces</h3><ul><li><a href="controllers.html">controllers</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu May 04 2023 10:51:03 GMT+0200 (hora de verano de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

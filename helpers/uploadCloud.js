@@ -1,5 +1,22 @@
 const cloudinary = require('../configs/cloudinayConfig');
 
+/** 
+ * @author Pablo
+ * @exports Object
+ * @module uploadCloud
+ */
+
+
+/**
+ * Sube una imagen a Cloudinary
+ * @method uploadCloud
+ * @async
+ * @param {String} urlPic URL de la imagen a subir a Cloudinary
+ * @param {String} publicID Nombre público que tendra la imagen
+ * @param {String} newFolder Carpeta donde almacenar la imagen
+ * @returns {String} URL de la imagen guardada en Cloudinary 
+ * @throws {String} Mensaje de error por consola
+ */
 const uploadCloud = async (urlPic, publicID, newFolder) => {
 
     let res;

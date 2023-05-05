@@ -1,5 +1,7 @@
 const User = require('../models/usersModel');
 const Invite = require('../models/invitesModel');
+const Chat = require('../models/chatsModel');
+
 const bcrypt = require('bcryptjs');
 const { uploadCloud } = require('../helpers/uploadCloud');
 const fs = require('fs').promises;
@@ -8,6 +10,123 @@ const { execute } = require('./socketController')
 const msgPass = 'Oculto por seguridad...';
 
 
+/** 
+ * @author Pablo
+ * @exports Object
+ * @module usersController
+ */
+
+
+/**
+ * Definición del tipo User
+ * @typedef {Object} User
+ * @property {String} _id ID del usuario
+ * @property {String} uid UID del usuario generado por Firebase
+ * @property {String} name Nombre del usuario
+ * @property {String} email Email del usuario
+ * @property {String} image URL de la imagen del usuario * 
+ * @property {Array} friends Lista de los ids de los amigos del usuario * 
+ * @property {Date} dateMod Fecha de modificación del perfil
+ * @property {Array} profile Elementos de tipo ProfileElement, que componen el perfil
+ * @property {Array} profileOrderIDs de los elementos que conforman el perfil en un orden específico
+ * @property {Array} privateProfile Elementos de tipo ProfileElement, que componen el perfil privado
+ * @property {Array} privateProfileOrder IDs de los elementos que conforman el perfil en un orden específico privado
+ * @property {Boolean} isAdmin Valor que designa si un usuario es administrador
+ */
+
+
+/**
+ * Definición del tipo Invite
+ * @typedef {Object} Invite 
+ * @property {String} _id ID de la invitación
+ * @property {String} sender ID del usuario que envió la invitación
+ * @property {String} receiver ID del usuario invitado
+ * @property {Date} date URL de la imagen del usuario 
+ */
+
+
+/**
+ * Definición del tipo Profile
+ * @typedef {Object} Profile
+ * @property {String} _id ID del usuario
+ * @property {String} uid ID generado por Firebase del usuario
+ * @property {String} name Nombre del usuario
+ * @property {String} email Email del usuario
+ * @property {String} image URL de la imagen del usuario
+ * @property {Array} profile Elementos de tipo ProfileElement, que componen el perfil
+ * @property {Array} profileOrder IDs de los elementos que conforman el perfil en un orden específico
+ */
+
+
+/**
+ * Definición del tipo ProfileElement
+ * @typedef {Object} ProfileElement
+ * @property {String} content El contenido del elemento (ej: url de la imagen o el value de un input)
+ * @property {String} typeInput Tipo de elemento (title, text, image, paragraph)
+ * @property {String} id ID del elemento
+ * @property {String} name Nombre del elemento
+ */
+
+
+/**
+* Devuelve todos los chats del usuario.
+* @method getChats
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, en el 
+params debe tener '_id' con el id del usuario.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y data, que es un array con los chats
+* @throws {json} Devuelve el error
+*/
+const getChats = async ({ params }, res) => {
+
+    try {
+
+        const { _id } = params;
+
+        const chats = await Chat.find({
+            $or: [
+                { "sender": _id },
+                { "receiver": _id }
+            ]
+        });
+
+        if (chats.length == 0)
+            return res.status(200).json({
+                ok: true,
+                msg: 'No hay chats en la bbdd.',
+                data: []
+            });
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Chats recuperadas con éxito',
+            data: chats
+        });
+
+    } catch (e) {
+        console.log('getChats error:', e);
+
+        return res.status(404).json({
+            ok: false,
+            msg: 'Error getChats: fallo al intentar recuperar todos los chats',
+            error: e
+        });
+
+    };
+};
+
+
+/**
+* Elimina una invitaciòn pasando el id.
+* @method deleteInvite
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, en el 
+body debe tener '_id' con el id del usuario.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg
+* @throws {json} Devuelve el error
+*/
 const deleteInvite = async ({ body }, res) => {
 
     try {
@@ -44,7 +163,15 @@ const deleteInvite = async ({ body }, res) => {
 };
 
 
-
+/**
+* Devuelve todas las invitaciones.
+* @method getInvites
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y data, que es un array con las invitaciones
+* @throws {json} Devuelve el error
+*/
 const getInvites = async (req, res) => {
 
     try {
@@ -77,7 +204,16 @@ const getInvites = async (req, res) => {
 };
 
 
-
+/**
+* Crea una invitación para ser amigos.
+* @method createInvite
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
+en el body: sender y receiver, con los ids de los usuarios.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg e invite, que es un json con la invitación creada
+* @throws {json} Devuelve el error
+*/
 const createInvite = async ({ body }, res) => {
 
     try {
@@ -91,8 +227,8 @@ const createInvite = async ({ body }, res) => {
         });
 
         if (yaExiste)
-            return res.status(400).json({
-                ok: false,
+            return res.status(200).json({
+                ok: true,
                 msg: `No es posible enviar la invitación, porque ya hay una pendiente de respuesta`,
             });
 
@@ -125,6 +261,17 @@ const createInvite = async ({ body }, res) => {
 }
 
 
+/**
+* Da respuesta a una invitación.
+* @method respondInvite
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
+en el body: sender, receiver, con los ids de los usuarios, _id: con el id de la invitación
+y accept: con la resolución de la invitación.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg e invite, que es un json con la invitación creada
+* @throws {json} Devuelve el error
+*/
 const respondInvite = async ({ body }, res) => {
 
     try {
@@ -138,7 +285,7 @@ const respondInvite = async ({ body }, res) => {
         if (!invite)
             return res.status(400).json({
                 ok: false,
-                msg: `No existe ninguna invitación con el ObjectId(${id})`
+                msg: `No existe ninguna invitación con el ObjectId(${_id})`
             });
 
         const friend1 = await User.findByIdAndUpdate(sender,
@@ -178,7 +325,15 @@ const respondInvite = async ({ body }, res) => {
 }
 
 
-
+/**
+* Devuelve todos los usuarios.
+* @method getUsers
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y data, que es un array con los usuarios
+* @throws {json} Devuelve el error
+*/
 const getUsers = async (req, res) => {
 
     try {
@@ -213,7 +368,16 @@ const getUsers = async (req, res) => {
 };
 
 
-
+/**
+* Devuelve un usuarios buscándolo por el email.
+* @method getUserByEmail
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
+params, email: con el correo del usuario
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
+* @throws {json} Devuelve el error
+*/
 const getUserByEmail = async ({ params }, res) => {
 
     try {
@@ -248,6 +412,16 @@ const getUserByEmail = async ({ params }, res) => {
 
 
 
+/**
+* Crea un usuario.
+* @method createUser
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
+body: uid, name, email, password e image.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
+* @throws {json} Devuelve el error
+*/
 const createUser = async (req, res) => {
 
     try {
@@ -284,11 +458,11 @@ const createUser = async (req, res) => {
             await fs.unlink(`./public/${req.file.filename}`);
 
 
-        execute({
-            to: '-1',
-            command: 'reload_profiles',
-            id: user._id
-        });
+        // execute({
+        //     to: '-1',
+        //     command: 'reload_profiles',
+        //     id: user._id
+        // });
 
         user.password = msgPass;
         return res.status(201).json({
@@ -311,7 +485,16 @@ const createUser = async (req, res) => {
 
 
 
-
+/**
+* Modifica un usuario.
+* @method updateUser
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
+body: _id, uid, name e image.
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
+* @throws {json} Devuelve el error
+*/
 const updateUser = async (req, res) => {
 
     try {
@@ -369,7 +552,16 @@ const updateUser = async (req, res) => {
 };
 
 
-
+/**
+* Elimina de la lista de amigos un usuario.
+* @method updateUsersFriends
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
+body: _id y friendID
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
+* @throws {json} Devuelve el error
+*/
 const updateUsersFriends = async ({ body }, res) => {
 
     try {
@@ -411,7 +603,13 @@ const updateUsersFriends = async ({ body }, res) => {
 };
 
 
-
+/**
+ * Ordena el array del perfil de usuario
+ * @method orderArray
+ * @param {Array} arrayOriginal El array del perfil del usuario
+ * @param {Array} arrayOrder El array del orden de los elementos del perfil
+ * @returns {Array} Devuelve un nuevo array ordenado según el orden de arrayOrder
+ */
 const orderArray = (arrayOriginal, arrayOrder) => {
 
     const newArray = [];
@@ -424,6 +622,15 @@ const orderArray = (arrayOriginal, arrayOrder) => {
 };
 
 
+/**
+ * Comprueba que se hayan recibido las imagenes del perfil del usuario, y en caso de
+ * que no estén, las reemplaza del perfil por las url de las imagenes almacenadas previamente
+ * @method checkAttachsFiles
+ * @param {Array} attachs son las imagenes que llegan en req.files
+ * @param {Array} profile Array con el perfil del usuario
+ * @returns {Array} Devuelve 2 arrays, uno con el perfil modificado y otro array con las imagenes que
+ * deben subirse a Cloudinary
+ */
 const checkAttachsFiles = (attachs, profile) => {
 
     const upload = [];
@@ -458,7 +665,16 @@ const checkAttachsFiles = (attachs, profile) => {
 };
 
 
-
+/**
+* Actualiza el perfil del usuario
+* @method updateUsersProfile
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
+body: _id, uid, profileOrder y todos los elementos que componen el perfil del usuario
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
+* @throws {json} Devuelve el error
+*/
 const updateUsersProfile = async (req, res) => {
 
     try {
@@ -558,17 +774,26 @@ const updateUsersProfile = async (req, res) => {
 };
 
 
-
+/**
+* Actualiza el perfil del usuario
+* @method deleteUser
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
+body: _id con el ide del usuario
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
+* @throws {json} Devuelve el error
+*/
 const deleteUser = async ({ body }, res) => {
 
     try {
 
-        const user = await User.findByIdAndDelete(body.id);
+        const user = await User.findByIdAndDelete(body._id);
 
         if (!user)
             return res.status(400).json({
                 ok: false,
-                msg: `No existe ningún usuario con el ObjectId(${body.id})`
+                msg: `No existe ningún usuario con el ObjectId(${body._id})`
             });
 
         execute({
@@ -647,5 +872,6 @@ module.exports = {
     updateUsersProfile,
     updateUser,
     deleteUser,
-    createUser
+    createUser,
+    getChats
 }

@@ -1,0 +1,22 @@
+{
+    "source": {
+        "includePattern": ".+\\.js(doc|x)?$",
+        "include": [
+            "./controllers",
+            "./configs",
+            "./helpers",
+            "./middlewares",
+            "./routers",
+            "./models"
+        ],
+        "exclude": [
+            "node_modules/|docs"
+        ]
+    },
+    "plugins": [],
+    "recurseDepth": 10,
+    "opts": {
+        "destination": "./docs/",
+        "recurse": true
+    }
+}

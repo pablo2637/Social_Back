@@ -1,2 +1,13 @@
 PORT= el puerto donde se va a ejecutar el servidor
 URI_CONNECT= la URI de conexión a la base de datos de Mongo
+
+Los datos de configuración de Cloudinary
+CLOUDINARY_URL= 
+CLOUDINARY_NAME=
+CLOUDINARY_KEY= 
+CLOUDINARY_API_SECRET= 
+
+URL_BACK= URL del servidor
+URL_CHAT_BACK= URL del chat del servidor
+
+CHAT_PORT= el puerto donde se va a ejecutar el servidor de chats

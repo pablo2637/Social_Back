@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: routers/Users</title>
+    <title>JSDoc: Module: profileController</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: routers/Users</h1>
+    <h1 class="page-title">Module: profileController</h1>
 
     
 
@@ -74,7 +74,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routers_routerUsers.js.html">routers/routerUsers.js</a>, <a href="routers_routerUsers.js.html#line4">line 4</a>
+        <a href="controllers_profileController.js.html">controllers/profileController.js</a>, <a href="controllers_profileController.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -101,16 +101,589 @@
     
 
     
-        <h3 class="subsection-title">Namespaces</h3>
 
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~checkAttachsFiles"><span class="type-signature">(inner) </span>checkAttachsFiles<span class="signature">(attachs, profile)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comprueba que se hayan recibido las imagenes del perfil del usuario, y en caso deque no estén, las reemplaza del perfil por las url de las imagenes almacenadas previamente
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>attachs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">son las imagenes que llegan en req.files</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>profile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array con el perfil del usuario</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_profileController.js.html">controllers/profileController.js</a>, <a href="controllers_profileController.js.html#line77">line 77</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Devuelve 2 arrays, uno con el perfil modificado y otro array con las imagenes quedeben subirse a Cloudinary
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~orderArray"><span class="type-signature">(inner) </span>orderArray<span class="signature">(arrayOriginal, arrayOrder)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Ordena el array del perfil de usuario
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>arrayOriginal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">El array del perfil del usuario</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>arrayOrder</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">El array del orden de los elementos del perfil</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_profileController.js.html">controllers/profileController.js</a>, <a href="controllers_profileController.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Devuelve un nuevo array ordenado según el orden de arrayOrder
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~updateUsersProfile"><span class="type-signature">(async, inner) </span>updateUsersProfile<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Actualiza el perfil del usuario
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Es el requerimiento que proviene de las rutas, necesita en el
+body: _id, uid, profileOrder y todos los elementos que componen el perfil del usuario</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Es la respuesta que proviene de las rutas</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_profileController.js.html">controllers/profileController.js</a>, <a href="controllers_profileController.js.html#line120">line 120</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        Devuelve el error
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
         <dl>
-            <dt><a href="module-routers_Users-routerUsers.html">routerUsers</a></dt>
-            <dd></dd>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">json</span>
+
+
+            </dd>
         </dl>
-    
+    </dt>
+    <dd></dd>
+</dl>
+
 
     
 
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Devuelve OK, msg y user, que es un json de tipo User
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">json</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
     
 
     
@@ -362,7 +935,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routers_routerUsers.js.html">routers/routerUsers.js</a>, <a href="routers_routerUsers.js.html#line29">line 29</a>
+        <a href="controllers_profileController.js.html">controllers/profileController.js</a>, <a href="controllers_profileController.js.html#line35">line 35</a>
     </li></ul></dd>
     
 
@@ -555,7 +1128,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routers_routerUsers.js.html">routers/routerUsers.js</a>, <a href="routers_routerUsers.js.html#line42">line 42</a>
+        <a href="controllers_profileController.js.html">controllers/profileController.js</a>, <a href="controllers_profileController.js.html#line48">line 48</a>
     </li></ul></dd>
     
 
@@ -932,7 +1505,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routers_routerUsers.js.html">routers/routerUsers.js</a>, <a href="routers_routerUsers.js.html#line11">line 11</a>
+        <a href="controllers_profileController.js.html">controllers/profileController.js</a>, <a href="controllers_profileController.js.html#line17">line 17</a>
     </li></ul></dd>
     
 

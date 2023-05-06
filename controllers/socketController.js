@@ -15,8 +15,7 @@ const chatRooms = [];
 /**
  * Definición del tipo Order
  * @typedef {Object} Order
- * @property {String} command La orden a ejecutar (reload_profiles / reload_invites / reload_user / 
- * reload_chats / reload_all)
+ * @property {Array} command Los comandos a ejecutar (profiles / invites / chats / user / all)
  * @property {String} to A quien debe emitirse la orden (1 / -1 / all)
  * @property {String} [id] El ID del usuario al que enviar la orden o al que NO debe enviarse según
  * se requiera
@@ -386,7 +385,7 @@ const createChat = async (data) => {
 
         execute({
             to: '1',
-            command: 'reload_chats',
+            command: ['chats'],
             id: data.receiver
         });
 
@@ -501,7 +500,7 @@ const saveChat = async (data) => {
 
             execute({
                 to: '1',
-                command: 'reload_chats',
+                command: ['chats'],
                 id: receiver
             });
         }

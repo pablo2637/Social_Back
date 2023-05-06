@@ -2,10 +2,11 @@ const User = require('../models/usersModel');
 const Invite = require('../models/invitesModel');
 const Chat = require('../models/chatsModel');
 
+const { FirebaseApp } = require('../configs/firebase');
 const bcrypt = require('bcryptjs');
 const { uploadCloud } = require('../helpers/uploadCloud');
 const fs = require('fs').promises;
-const { execute } = require('./socketController')
+const { execute } = require('./socketController');
 
 const msgPass = 'Oculto por seguridad...';
 
@@ -67,262 +68,6 @@ const msgPass = 'Oculto por seguridad...';
  * @property {String} name Nombre del elemento
  */
 
-
-/**
-* Devuelve todos los chats del usuario.
-* @method getChats
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, en el 
-params debe tener '_id' con el id del usuario.
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg y data, que es un array con los chats
-* @throws {json} Devuelve el error
-*/
-const getChats = async ({ params }, res) => {
-
-    try {
-
-        const { _id } = params;
-
-        const chats = await Chat.find({
-            $or: [
-                { "sender": _id },
-                { "receiver": _id }
-            ]
-        });
-
-        if (chats.length == 0)
-            return res.status(200).json({
-                ok: true,
-                msg: 'No hay chats en la bbdd.',
-                data: []
-            });
-
-        return res.status(200).json({
-            ok: true,
-            msg: 'Chats recuperadas con éxito',
-            data: chats
-        });
-
-    } catch (e) {
-        console.log('getChats error:', e);
-
-        return res.status(404).json({
-            ok: false,
-            msg: 'Error getChats: fallo al intentar recuperar todos los chats',
-            error: e
-        });
-
-    };
-};
-
-
-/**
-* Elimina una invitaciòn pasando el id.
-* @method deleteInvite
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, en el 
-body debe tener '_id' con el id del usuario.
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg
-* @throws {json} Devuelve el error
-*/
-const deleteInvite = async ({ body }, res) => {
-
-    try {
-        console.log('body', body)
-        const invite = await Invite.findByIdAndDelete(body._id);
-        console.log('invite', invite)
-        if (!invite)
-            return res.status(400).json({
-                ok: false,
-                msg: `No existe ninguna invitación con el ObjectId(${body._id})`
-            });
-
-        execute({
-            to: '-1',
-            command: 'reload_invites',
-            id: invite.sender
-        });
-
-        return res.status(201).json({
-            ok: true,
-            msg: 'Invitación eliminada con éxito.'
-        });
-
-    } catch (e) {
-        console.log('deleteInvite error:', e);
-
-        return res.status(500).json({
-            ok: false,
-            msg: 'deleteInvite: Ha habido un fallo al eliminar la invitación.',
-            error: e
-        });
-
-    };
-};
-
-
-/**
-* Devuelve todas las invitaciones.
-* @method getInvites
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg y data, que es un array con las invitaciones
-* @throws {json} Devuelve el error
-*/
-const getInvites = async (req, res) => {
-
-    try {
-
-        const invites = await Invite.find({ response: false });
-
-        if (invites.length == 0)
-            return res.status(200).json({
-                ok: true,
-                msg: 'No hay invitaciones en la bbdd.',
-                data: []
-            });
-
-        return res.status(200).json({
-            ok: true,
-            msg: 'Invitaciones recuperadas con éxito',
-            data: invites
-        });
-
-    } catch (e) {
-        console.log('getInvites error:', e);
-
-        return res.status(404).json({
-            ok: false,
-            msg: 'Error getInvites: fallo al intentar recuperar todos las invitaciones',
-            error: e
-        });
-
-    };
-};
-
-
-/**
-* Crea una invitación para ser amigos.
-* @method createInvite
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
-en el body: sender y receiver, con los ids de los usuarios.
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg e invite, que es un json con la invitación creada
-* @throws {json} Devuelve el error
-*/
-const createInvite = async ({ body }, res) => {
-
-    try {
-
-        const { sender, receiver } = body;
-
-        const yaExiste = await Invite.findOne({
-            "sender": sender,
-            "receiver": receiver,
-            "response": false
-        });
-
-        if (yaExiste)
-            return res.status(200).json({
-                ok: true,
-                msg: `No es posible enviar la invitación, porque ya hay una pendiente de respuesta`,
-            });
-
-
-        const invite = new Invite({ sender, receiver });
-
-        await invite.save();
-
-        execute({
-            to: '1',
-            command: 'reload_invites',
-            id: receiver
-        });
-        return res.status(201).json({
-            ok: true,
-            msg: 'Invitación creada con éxito',
-            invite
-        });
-
-    } catch (e) {
-        console.log('incomingInvite error:', e);
-
-        return res.status(500).json({
-            ok: false,
-            msg: 'incomingInvite: Ha habido un fallo al crear la invitación.',
-            error: e
-        });
-
-    };
-}
-
-
-/**
-* Da respuesta a una invitación.
-* @method respondInvite
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
-en el body: sender, receiver, con los ids de los usuarios, _id: con el id de la invitación
-y accept: con la resolución de la invitación.
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg e invite, que es un json con la invitación creada
-* @throws {json} Devuelve el error
-*/
-const respondInvite = async ({ body }, res) => {
-
-    try {
-
-        const response = true;
-        const { accept, _id, sender, receiver } = body;
-
-        const invite = await Invite.findByIdAndUpdate(_id,
-            { response, accept }, { new: true });
-
-        if (!invite)
-            return res.status(400).json({
-                ok: false,
-                msg: `No existe ninguna invitación con el ObjectId(${_id})`
-            });
-
-        const friend1 = await User.findByIdAndUpdate(sender,
-            { $push: { friends: receiver } }, { new: true });
-
-        const friend2 = await User.findByIdAndUpdate(receiver,
-            { $push: { friends: sender } }, { new: true });
-
-        if (!friend1 || !friend2)
-            return res.status(400).json({
-                ok: false,
-                msg: `Error al agregar el amigo`
-            });
-
-
-        execute({
-            to: '1',
-            command: 'reload_user-invites',
-            id: sender
-        });
-        return res.status(200).json({
-            ok: true,
-            msg: 'Invitación actualizada con éxito',
-            invite
-        });
-
-    } catch (e) {
-        console.log('respondInvite error:', e);
-
-        return res.status(500).json({
-            ok: false,
-            msg: 'respondInvite: Ha habido un fallo al responder a la invitación.',
-            error: e
-        });
-
-    };
-}
 
 
 /**
@@ -458,11 +203,10 @@ const createUser = async (req, res) => {
             await fs.unlink(`./public/${req.file.filename}`);
 
 
-        // execute({
-        //     to: '-1',
-        //     command: 'reload_profiles',
-        //     id: user._id
-        // });
+        execute({
+            to: 'all',
+            command: ['profiles']
+        });
 
         user.password = msgPass;
         return res.status(201).json({
@@ -527,7 +271,7 @@ const updateUser = async (req, res) => {
 
         execute({
             to: '-1',
-            command: 'reload_profiles',
+            command: ['profiles'],
             id: _id
         });
 
@@ -552,234 +296,15 @@ const updateUser = async (req, res) => {
 };
 
 
-/**
-* Elimina de la lista de amigos un usuario.
-* @method updateUsersFriends
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
-body: _id y friendID
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
-* @throws {json} Devuelve el error
-*/
-const updateUsersFriends = async ({ body }, res) => {
-
-    try {
-
-        const { _id, friendID } = body;
-
-        const user = await User.findByIdAndUpdate(_id, { $pull: { friends: friendID } }, { new: true });
-
-        if (!user)
-            return res.status(400).json({
-                ok: false,
-                msg: `No existe ningún usuario con el ObjectId(${_id})`
-            });
-
-
-        execute({
-            to: '1',
-            command: 'reload_user',
-            id: friendID
-        });
-
-        user.password = msgPass;
-        return res.status(201).json({
-            ok: true,
-            msg: 'Usuario actualizado con éxito',
-            user
-        });
-
-    } catch (e) {
-        console.log('updateUsersFriends error:', e);
-
-        return res.status(500).json({
-            ok: false,
-            msg: 'updateUsersFriends: Ha habido un fallo al modificar el usuario.',
-            error: e
-        });
-
-    };
-};
-
 
 /**
- * Ordena el array del perfil de usuario
- * @method orderArray
- * @param {Array} arrayOriginal El array del perfil del usuario
- * @param {Array} arrayOrder El array del orden de los elementos del perfil
- * @returns {Array} Devuelve un nuevo array ordenado según el orden de arrayOrder
- */
-const orderArray = (arrayOriginal, arrayOrder) => {
-
-    const newArray = [];
-
-    arrayOrder.forEach(el => {
-        newArray.push(arrayOriginal.find(elAO => elAO.id == el));
-    });
-
-    return newArray;
-};
-
-
-/**
- * Comprueba que se hayan recibido las imagenes del perfil del usuario, y en caso de
- * que no estén, las reemplaza del perfil por las url de las imagenes almacenadas previamente
- * @method checkAttachsFiles
- * @param {Array} attachs son las imagenes que llegan en req.files
- * @param {Array} profile Array con el perfil del usuario
- * @returns {Array} Devuelve 2 arrays, uno con el perfil modificado y otro array con las imagenes que
- * deben subirse a Cloudinary
- */
-const checkAttachsFiles = (attachs, profile) => {
-
-    const upload = [];
-    for (const [key, value] of Object.entries(profile)) {
-
-        if (key.includes('imageURL')) {
-
-            const tempImg = key.split('_');
-            const exists = attachs.find(att => att.fieldname == tempImg[0]);
-
-            if (!exists) {
-
-                profile[tempImg[0]] = value
-
-                const tempName = value.split('/');
-                upload.push({
-                    url: value,
-                    name: tempName[tempName.length - 1]
-                })
-            }
-
-            delete profile[key];
-        }
-    };
-
-    for (const key of Object.entries(profile)) {
-
-        if (key.includes('imageURL')) delete profile[key];
-    };
-
-    return { profile, upload };
-};
-
-
-/**
-* Actualiza el perfil del usuario
-* @method updateUsersProfile
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
-body: _id, uid, profileOrder y todos los elementos que componen el perfil del usuario
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
-* @throws {json} Devuelve el error
-*/
-const updateUsersProfile = async (req, res) => {
-
-    try {
-
-        // console.log('req files', req.files)
-        // console.log('req body', req.body)
-        const body = new Object(req.body);
-        const { _id, uid, profileOrder, ...profile } = body;
-
-        let newProfile = [];
-        const newProfileOrder = profileOrder.split(',');
-
-        const arrayFiles = req.files || [];
-
-        // console.log('newProfileOrder', newProfileOrder)
-        // console.log('profile', profile)
-
-        const { profile: arrayOK, upload } = checkAttachsFiles(arrayFiles, profile);
-        // console.log('arrayOK', arrayOK, 'upload', upload)
-
-        for (const key in arrayOK) {
-            const tempKey = key.split('-');
-            newProfile.push({
-                content: profile[key],
-                typeInput: tempKey[0],
-                id: key,
-                name: key
-            });
-        }
-
-
-        let urlPic;
-        if (arrayFiles) {
-
-            for (let i = 0; i < arrayFiles.length; i++) {
-                urlPic = await uploadCloud(`./public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
-                newProfile.push({
-                    content: urlPic,
-                    typeInput: 'image',
-                    id: arrayFiles[i].fieldname,
-                    name: arrayFiles[i].fieldname
-                });
-            };
-        }
-
-        for (let i = 0; i < upload.length; i++) {
-            urlPic = await uploadCloud(upload[i].url, upload[i].name, `Social/${body.uid}`);
-        };
-
-
-        // console.log('newProfile before', newProfile);
-        newProfile = orderArray(newProfile, newProfileOrder);
-        // console.log('newProfile after', newProfile);
-
-
-        const update = { $set: { profile: newProfile, profileOrder: newProfileOrder, dateMod: Date() } };
-        const response = await User.updateOne({ _id }, update, { new: true });
-
-        if (!response)
-            return res.status(400).json({
-                ok: false,
-                msg: `No existe ningún usuario con el ObjectId(${id})`
-            });
-
-
-        const user = await User.findById(_id);
-
-        if (arrayFiles) {
-            for (let i = 0; i < arrayFiles.length; i++) {
-                await fs.unlink(`./public/${arrayFiles[i].filename}`);
-            }
-        }
-
-        execute({
-            to: '-1',
-            command: 'reload_profiles',
-            id: _id
-        });
-
-        user.password = msgPass;
-        return res.status(201).json({
-            ok: true,
-            msg: 'Usuario actualizado con éxito',
-            user
-        });
-
-    } catch (e) {
-        console.log('updateUsersProfile error:', e);
-
-        return res.status(500).json({
-            ok: false,
-            msg: 'updateUsersProfile: Ha habido un fallo al modificar el usuario.',
-            error: e
-        });
-
-    };
-};
-
-
-/**
-* Actualiza el perfil del usuario
+* Elimina un usuario de la base de datos de Firebase, de la de MongoDB borra: el usuario,
+* las invitaciones y actualiza sus chats para marcar que ese usuario ha sido eliminado y por
+* último quita este usuario de las listas de amigos que lo contengan.
 * @method deleteUser
 * @async
 * @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
-body: _id con el ide del usuario
+body: _id con el ID del usuario y uid: con el UID del usuario de Firebase
 * @param {Object} res Es la respuesta que proviene de las rutas 
 * @returns {json} Devuelve OK, msg y user, que es un json de tipo User
 * @throws {json} Devuelve el error
@@ -788,7 +313,11 @@ const deleteUser = async ({ body }, res) => {
 
     try {
 
-        const user = await User.findByIdAndDelete(body._id);
+        const { _id, uid } = body;
+
+        await FirebaseApp.auth().deleteUser(uid);
+
+        const user = await User.findByIdAndDelete(_id);
 
         if (!user)
             return res.status(400).json({
@@ -796,9 +325,34 @@ const deleteUser = async ({ body }, res) => {
                 msg: `No existe ningún usuario con el ObjectId(${body._id})`
             });
 
+
+        await Invite.deleteMany({
+            $or: [
+                { "sender": _id },
+                { "receiver": _id }
+            ]
+        });
+
+        await Chat.updateMany({
+            $or: [
+                { "sender": _id },
+                { "receiver": _id }
+            ]
+        }, { $set: { userDeleted: _id } });
+
+        await User.updateMany({ "friends": _id }, { $pull: { "friends": _id } });
+
+
         execute({
-            to: 'all',
-            command: 'reload_profiles'
+            to: '-1',
+            command: ['invites', 'profiles', 'chats', 'friends'],
+            id: _id
+        });
+
+        execute({
+            to: '1',
+            command: ['logout'],
+            id: _id
         });
 
         return res.status(201).json({
@@ -861,17 +415,10 @@ const loginUser = async ({ body }, res) => {
 
 
 module.exports = {
-    createInvite,
-    respondInvite,
-    deleteInvite,
-    getInvites,
     getUsers,
     getUserByEmail,
-    updateUsersFriends,
     loginUser,
-    updateUsersProfile,
     updateUser,
     deleteUser,
-    createUser,
-    getChats
+    createUser
 }

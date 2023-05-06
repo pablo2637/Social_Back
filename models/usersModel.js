@@ -18,6 +18,7 @@ const { Schema, model } = require('mongoose');
  * @property {String} password Password del usuario
  * @property {String} image URL de la imagen
  * @property {Array} [friends] Lista de IDs de los amigos del usuario
+ * @property {Array} [msgs] Elementos que componen un mensaje: msg, from, date, read
  * @property {Array} [profile] Elementos que componen el perfil público
  * @property {Array} [profileOrder] Lista de IDs que especifican el orden de los elementos del perfil público
  * @property {Array} [privateProfile] Elementos que componen el perfil privado
@@ -65,6 +66,11 @@ const UserSchema = new Schema({
     },
 
     friends: {
+        type: Array,
+        default: []
+    },
+
+    msgs: {
         type: Array,
         default: []
     },

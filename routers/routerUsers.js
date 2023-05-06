@@ -60,28 +60,46 @@ const router = express.Router();
 const { check } = require('express-validator');
 const { validateInputs } = require('../middlewares/validateInputs');
 
-const { upload, uploadMulti } = require('../middlewares/uploadImg')
+const { upload, uploadMulti } = require('../middlewares/uploadImg');
+
 
 const {
-    createInvite, respondInvite, getInvites, deleteInvite,
-
-    createUser, updateUser, deleteUser,
-
-    getUsers, getUserByEmail,
-
-    getChats,
+    createUser,
+    updateUser,
+    deleteUser,
+    getUsers,
+    getUserByEmail,
 
     loginUser,
-
-    updateUsersFriends,
-
-    updateUsersProfile
-
 } = require('../controllers/usersController');
 
 
+const {
+    updateUsersProfile
+} = require('../controllers/profileController');
+
+
+
+const {
+    getChats,
+    getMsgs,
+    createMsg,
+    getFriends,
+    updateUsersFriends
+} = require('../controllers/othersControllers');
+
+
+const {
+    createInvite,
+    deleteInvite,
+    getInvites,
+    respondInvite
+} = require('../controllers/invitesController');
+
+
+
 /**
-* Ruta para devolver todos los chats de un usuarios
+* Ruta para devolver todos los chats de un usuario
 * @name (get)/chats/:
 * @function
 * @memberof module:routers/Users~routerUsers
@@ -92,13 +110,48 @@ router.get('/chats/:_id', getChats);
 
 
 /**
-* Ruta para devolver todos los chats de un usuarios
+* Ruta para crear un mensaje de un usuario a otro
+* @name (post)/msg
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {Object} body Debe contenter msg: el mensaje a enviar, from: ID del usuario
+que envia el mensaje e _id: el ID del usuario que recibirá el mensaje
+* @inner
+*/
+router.post('/msg', createMsg);
+
+
+/**
+* Ruta para devolver todos los mensajes de un usuario
+* @name (get)/msg/:
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} _id El ID del usuario
+* @inner
+*/
+router.get('/msg/:_id', getMsgs);
+
+
+/**
+* Ruta para devolver todos los amigos
+* @name (get)/friends/:
+* @function
+* @memberof module:routers/Users~routerUsers
+* @inner
+*/
+router.get('/friends/:_id', getFriends);
+
+
+
+/**
+* Ruta para devolver todos los usuarios
 * @name (get)/Users
 * @function
 * @memberof module:routers/Users~routerUsers
 * @inner
 */
 router.get('/', getUsers);
+
 
 
 /**
@@ -110,6 +163,7 @@ router.get('/', getUsers);
 * @inner
 */
 router.get('/email/:email', getUserByEmail);
+
 
 
 /**
@@ -125,6 +179,7 @@ router.put('/profile', [
 ], updateUsersProfile);
 
 
+
 /**
 * Ruta para eliminar un amigo de la lista de amigos de un usuario
 * @name (put)/friends
@@ -137,49 +192,6 @@ router.put('/profile', [
 router.put('/friends', updateUsersFriends);
 
 
-/**
-* Ruta para crear una invitación
-* @name (post)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @param {String} sender [body] El ID del usuario que envía la invitación
-* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
-* @inner
-*/
-router.post('/invite', createInvite);
-
-
-/**
-* Ruta para responder a una invitación
-* @name (put)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @param {String} sender [body] El ID del usuario que envía la invitación
-* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
-* @inner
-*/
-router.put('/invite', respondInvite);
-
-
-/**
-* Ruta para eliminar una invitación
-* @name (delete)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @param {String} _id [body] El ID de la invitación a eliminar
-* @inner
-*/
-router.delete('/invite', deleteInvite);
-
-
-/**
-* Ruta que devuelve todas las invitaciones activas
-* @name (get)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @inner
-*/
-router.get('/invite', getInvites);
 
 
 /**
@@ -199,6 +211,7 @@ router.post('/', [
 ], createUser);
 
 
+
 /**
 * Ruta para editar un usuario
 * @name (put)/
@@ -215,6 +228,7 @@ router.put('/', [
 ], updateUser);
 
 
+
 /**
 * Ruta para eliminar un usuario
 * @name (delete)/
@@ -224,6 +238,54 @@ router.put('/', [
 * @inner
 */
 router.delete('/', deleteUser);
+
+
+/**
+* Ruta para crear una invitación
+* @name (post)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} sender [body] El ID del usuario que envía la invitación
+* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
+* @inner
+*/
+router.post('/invite', createInvite);
+
+
+
+/**
+* Ruta para responder a una invitación
+* @name (put)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} sender [body] El ID del usuario que envía la invitación
+* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
+* @inner
+*/
+router.put('/invite', respondInvite);
+
+
+
+/**
+* Ruta para eliminar una invitación
+* @name (delete)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} _id [body] El ID de la invitación a eliminar
+* @inner
+*/
+router.delete('/invite', deleteInvite);
+
+
+
+/**
+* Ruta que devuelve todas las invitaciones activas
+* @name (get)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @inner
+*/
+router.get('/invite', getInvites);
 
 
 router.post('/login', [

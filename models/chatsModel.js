@@ -13,6 +13,8 @@ const { Schema, model } = require('mongoose');
  * @typedef {Object} ChatSchema
  * @property {Schema.Types.ObjectId} sender ID del usuario que inició el chat
  * @property {Schema.Types.ObjectId} receiver ID del otro usuario que del chat
+ * @property {Schema.Types.ObjectId} userDeleted Si el administrador ha eliminado algún participante
+ * de este chat, es el ID del usuario eliminado
  * @property {String} chatName Nombre del chat
  * @property {Array} chat Mensajes enviados por los 2 usuarios
  * @property {Number} readSender Indíce del último mensaje leído por el usuario que inició el chat
@@ -35,6 +37,11 @@ const ChatSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+
+    userDeleted: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
 
     name: {

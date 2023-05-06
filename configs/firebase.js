@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 
 const config = {
-    credential: admin.credential.cert('fireBaseAdmin.json')
+    credential: admin.credential.cert(process.env.URL_BACK + '/fireBaseAdmin.json')
 }
 
 // const fb = {

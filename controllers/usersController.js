@@ -2,7 +2,7 @@ const User = require('../models/usersModel');
 const Invite = require('../models/invitesModel');
 const Chat = require('../models/chatsModel');
 
-const { FirebaseApp } = require('../configs/firebase');
+const { FirebaseApp } = require('../helpers/firebase');
 const bcrypt = require('bcryptjs');
 const { uploadCloud } = require('../helpers/uploadCloud');
 const fs = require('fs').promises;

@@ -118,8 +118,9 @@ const checkAttachsFiles = (attachs, profile) => {
 };
 
 
+
 /**
-* Actualiza el perfil del usuario
+* Actualiza el perfil público del usuario
 * @method updateUsersProfile
 * @async
 * @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
@@ -132,8 +133,6 @@ const updateUsersProfile = async (req, res) => {
 
     try {
 
-        // console.log('req files', req.files)
-        // console.log('req body', req.body)
         const body = new Object(req.body);
         const { _id, uid, profileOrder, ...profile } = body;
 
@@ -142,11 +141,8 @@ const updateUsersProfile = async (req, res) => {
 
         const arrayFiles = req.files || [];
 
-        // console.log('newProfileOrder', newProfileOrder)
-        // console.log('profile', profile)
-
         const { profile: arrayOK, upload } = checkAttachsFiles(arrayFiles, profile);
-        // console.log('arrayOK', arrayOK, 'upload', upload)
+     
 
         for (const key in arrayOK) {
             const tempKey = key.split('-');
@@ -178,9 +174,7 @@ const updateUsersProfile = async (req, res) => {
         };
 
 
-        // console.log('newProfile before', newProfile);
         newProfile = orderArray(newProfile, newProfileOrder);
-        // console.log('newProfile after', newProfile);
 
 
         const update = { $set: { profile: newProfile, profileOrder: newProfileOrder, dateMod: Date() } };
@@ -227,6 +221,111 @@ const updateUsersProfile = async (req, res) => {
 };
 
 
+
+
+/**
+* Actualiza el perfil privado del usuario
+* @method updateUsersProfile
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
+body: _id, uid, profileOrder y todos los elementos que componen el perfil del usuario
+* @param {Object} res Es la respuesta que proviene de las rutas 
+* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
+* @throws {json} Devuelve el error
+*/
+const updateUsersPrivateProfile = async (req, res) => {
+
+    try {
+
+        const body = new Object(req.body);
+        const { _id, uid, privateProfileOrder, ...privateProfile } = body;
+
+        let newProfile = [];
+        const newProfileOrder = privateProfileOrder.split(',');
+
+        const arrayFiles = req.files || [];
+
+
+        const { profile: arrayOK, upload } = checkAttachsFiles(arrayFiles, privateProfile);
+        
+        for (const key in arrayOK) {
+            const tempKey = key.split('-');
+            newProfile.push({
+                content: privateProfile[key],
+                typeInput: tempKey[0],
+                id: key,
+                name: key
+            });
+        }
+
+
+        let urlPic;
+        if (arrayFiles) {
+
+            for (let i = 0; i < arrayFiles.length; i++) {
+                urlPic = await uploadCloud(`./public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
+                newProfile.push({
+                    content: urlPic,
+                    typeInput: 'image',
+                    id: arrayFiles[i].fieldname,
+                    name: arrayFiles[i].fieldname
+                });
+            };
+        }
+
+        for (let i = 0; i < upload.length; i++) {
+            urlPic = await uploadCloud(upload[i].url, upload[i].name, `Social/${body.uid}/private`);
+        };
+
+
+        newProfile = orderArray(newProfile, newProfileOrder);
+
+
+        const update = { $set: { privateProfile: newProfile, privateProfileOrder: newProfileOrder, privateDateMod: Date() } };
+        const response = await User.updateOne({ _id }, update, { new: true });
+
+        if (!response)
+            return res.status(400).json({
+                ok: false,
+                msg: `No existe ningún usuario con el ObjectId(${id})`
+            });
+
+
+        const user = await User.findById(_id);
+
+        if (arrayFiles) {
+            for (let i = 0; i < arrayFiles.length; i++) {
+                await fs.unlink(`./public/${arrayFiles[i].filename}`);
+            }
+        }
+
+        execute({
+            to: '-1',
+            command: ['profiles'],
+            id: _id
+        });
+
+        user.password = msgPass;
+        return res.status(201).json({
+            ok: true,
+            msg: 'Usuario actualizado con éxito',
+            user
+        });
+
+    } catch (e) {
+        console.log('updateUsersPrivateProfile error:', e);
+
+        return res.status(500).json({
+            ok: false,
+            msg: 'updateUsersPrivateProfile: Ha habido un fallo al modificar el usuario.',
+            error: e
+        });
+
+    };
+};
+
+
 module.exports = {
-    updateUsersProfile
+    updateUsersProfile,
+    updateUsersPrivateProfile
 }

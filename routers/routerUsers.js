@@ -75,7 +75,8 @@ const {
 
 
 const {
-    updateUsersProfile
+    updateUsersProfile,
+    updateUsersPrivateProfile
 } = require('../controllers/profileController');
 
 
@@ -167,7 +168,7 @@ router.get('/email/:email', getUserByEmail);
 
 
 /**
-* Ruta para actualizar el perfil del usuario
+* Ruta para actualizar el perfil privado del usuario
 * @name (put)/profile
 * @function
 * @memberof module:routers/Users~routerUsers
@@ -177,6 +178,20 @@ router.get('/email/:email', getUserByEmail);
 router.put('/profile', [
     uploadMulti
 ], updateUsersProfile);
+
+
+
+/**
+* Ruta para actualizar el perfil privado del usuario
+* @name (put)/privateProfile
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {Profile} profile [body] El perfil del usuario
+* @inner
+*/
+router.put('/privateprofile', [
+    uploadMulti
+], updateUsersPrivateProfile);
 
 
 

@@ -20,7 +20,7 @@ app.use(express.json());                             // Parse application/json
 //Conexión
 connect();
 
-//Server socket
+//Chat server socket
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -36,8 +36,9 @@ app.use('/api/public', require('./routers/routerPublic'));    //Profiles
 app.use('/api/socket', require('./routers/routerSocket'));    //Execute socket commands
 
 
-const { socketController } = require('./controllers/socketController')
-socketController()
+//Chat server controller
+const { socketController } = require('./controllers/socketController');
+socketController();
 
 
 //404

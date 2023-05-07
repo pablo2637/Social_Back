@@ -30,7 +30,7 @@
 const Invite = require('../models/invitesModel');
 const Chat = require('../models/chatsModel');
 
-const { FirebaseApp } = require('../configs/firebase');
+const { FirebaseApp } = require('../helpers/firebase');
 const bcrypt = require('bcryptjs');
 const { uploadCloud } = require('../helpers/uploadCloud');
 const fs = require('fs').promises;
@@ -95,62 +95,6 @@ const msgPass = 'Oculto por seguridad...';
  * @property {String} id ID del elemento
  * @property {String} name Nombre del elemento
  */
-
-
-/**
-* Devuelve todos los chats del usuario.
-* @method getChats
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, en el 
-params debe tener '_id' con el id del usuario.
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg y data, que es un array con los chats
-* @throws {json} Devuelve el error
-*/
-const getChats = async ({ params }, res) => {
-
-    try {
-
-        const { _id } = params;
-        console.log('_id', _id)
-
-        if (_id == 'undefined')
-            return res.status(404).json({
-                ok: false,
-                msg: 'Error getChats: el valor de "_id" es "undefined"'
-            });
-
-        const chats = await Chat.find({
-            $or: [
-                { "sender": _id },
-                { "receiver": _id }
-            ]
-        });
-
-        if (chats.length == 0)
-            return res.status(200).json({
-                ok: true,
-                msg: 'No hay chats en la bbdd.',
-                data: []
-            });
-
-        return res.status(200).json({
-            ok: true,
-            msg: 'Chats recuperadas con éxito',
-            data: chats
-        });
-
-    } catch (e) {
-        console.log('getChats error:', e);
-
-        return res.status(404).json({
-            ok: false,
-            msg: 'Error getChats: fallo al intentar recuperar todos los chats',
-            error: e
-        });
-
-    };
-};
 
 
 
@@ -380,57 +324,6 @@ const updateUser = async (req, res) => {
 };
 
 
-/**
-* Elimina de la lista de amigos un usuario.
-* @method updateUsersFriends
-* @async
-* @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
-body: _id y friendID
-* @param {Object} res Es la respuesta que proviene de las rutas 
-* @returns {json} Devuelve OK, msg y user, que es un json de tipo User
-* @throws {json} Devuelve el error
-*/
-const updateUsersFriends = async ({ body }, res) => {
-
-    try {
-
-        const { _id, friendID } = body;
-
-        const user = await User.findByIdAndUpdate(_id, { $pull: { friends: friendID } }, { new: true });
-
-        if (!user)
-            return res.status(400).json({
-                ok: false,
-                msg: `No existe ningún usuario con el ObjectId(${_id})`
-            });
-
-
-        execute({
-            to: '1',
-            command: ['user'],
-            id: friendID
-        });
-
-        user.password = msgPass;
-        return res.status(201).json({
-            ok: true,
-            msg: 'Usuario actualizado con éxito',
-            user
-        });
-
-    } catch (e) {
-        console.log('updateUsersFriends error:', e);
-
-        return res.status(500).json({
-            ok: false,
-            msg: 'updateUsersFriends: Ha habido un fallo al modificar el usuario.',
-            error: e
-        });
-
-    };
-};
-
-
 
 /**
 * Elimina un usuario de la base de datos de Firebase, de la de MongoDB borra: el usuario,
@@ -480,7 +373,7 @@ const deleteUser = async ({ body }, res) => {
 
         execute({
             to: '-1',
-            command: ['invites', 'profiles', 'chats'],
+            command: ['invites', 'profiles', 'chats', 'friends'],
             id: _id
         });
 
@@ -552,12 +445,10 @@ const loginUser = async ({ body }, res) => {
 module.exports = {
     getUsers,
     getUserByEmail,
-    updateUsersFriends,
     loginUser,
     updateUser,
     deleteUser,
-    createUser,
-    getChats
+    createUser
 }</code></pre>
         </article>
     </section>
@@ -568,13 +459,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-chatModels.html">chatModels</a></li><li><a href="module-dbConnect.html">dbConnect</a></li><li><a href="module-invitesController.html">invitesController</a></li><li><a href="module-invitesModel.html">invitesModel</a></li><li><a href="module-profileController.html">profileController</a></li><li><a href="module-publicController.html">publicController</a></li><li><a href="module-routers_Public.html">routers/Public</a></li><li><a href="module-routers_Socket.html">routers/Socket</a></li><li><a href="module-routers_Users.html">routers/Users</a></li><li><a href="module-socketController.html">socketController</a></li><li><a href="module-uploadCloud.html">uploadCloud</a></li><li><a href="module-uploadImg.html">uploadImg</a></li><li><a href="module-usersController.html">usersController</a></li><li><a href="module-usersModel.html">usersModel</a></li><li><a href="module-validateInputs.html">validateInputs</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-routers_Public-routerPublic.html">routerPublic</a></li><li><a href="module-routers_Socket-routerSocket.html">routerSocket</a></li><li><a href="module-routers_Users-routerUsers.html">routerUsers</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-chatModels.html">chatModels</a></li><li><a href="module-dbConnect.html">dbConnect</a></li><li><a href="module-invitesController.html">invitesController</a></li><li><a href="module-invitesModel.html">invitesModel</a></li><li><a href="module-othersController.html">othersController</a></li><li><a href="module-profileController.html">profileController</a></li><li><a href="module-publicController.html">publicController</a></li><li><a href="module-routers_Public.html">routers/Public</a></li><li><a href="module-routers_Socket.html">routers/Socket</a></li><li><a href="module-routers_Users.html">routers/Users</a></li><li><a href="module-socketController.html">socketController</a></li><li><a href="module-uploadCloud.html">uploadCloud</a></li><li><a href="module-uploadImg.html">uploadImg</a></li><li><a href="module-usersController.html">usersController</a></li><li><a href="module-usersModel.html">usersModel</a></li><li><a href="module-validateInputs.html">validateInputs</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-routers_Public-routerPublic.html">routerPublic</a></li><li><a href="module-routers_Socket-routerSocket.html">routerSocket</a></li><li><a href="module-routers_Users-routerUsers.html">routerUsers</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat May 06 2023 15:41:04 GMT+0200 (hora de verano de Europa central)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun May 07 2023 21:19:15 GMT+0200 (hora de verano de Europa central)
 </footer>
 
 <script> prettyPrint(); </script>

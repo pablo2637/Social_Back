@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: invitesController</title>
+    <title>JSDoc: Module: othersController</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: invitesController</h1>
+    <h1 class="page-title">Module: othersController</h1>
 
     
 
@@ -74,7 +74,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_invitesController.js.html">controllers/invitesController.js</a>, <a href="controllers_invitesController.js.html#line6">line 6</a>
+        <a href="controllers_othersControllers.js.html">controllers/othersControllers.js</a>, <a href="controllers_othersControllers.js.html#line8">line 8</a>
     </li></ul></dd>
     
 
@@ -113,7 +113,7 @@
     
 
     
-    <h4 class="name" id="~createInvite"><span class="type-signature">(async, inner) </span>createInvite<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
+    <h4 class="name" id="~createMsg"><span class="type-signature">(async, inner) </span>createMsg<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
     
 
     
@@ -121,7 +121,7 @@
 
 
 <div class="description">
-    Crea una invitación para ser amigos.
+    Crea un mensaje de un usuario a otro
 </div>
 
 
@@ -173,8 +173,7 @@
 
             
 
-            <td class="description last">Es el requerimiento que proviene de las rutas, debe contener
-en el body: sender y receiver, con los ids de los usuarios.</td>
+            <td class="description last">Es el requerimiento que proviene de las rutas, en el body debe tener '_id' con el ID del usuario que recibirá el mensaje, msg: el mensaje en síy from: el ID del usuario que envía el mensaje</td>
         </tr>
 
     
@@ -238,219 +237,7 @@ en el body: sender y receiver, con los ids de los usuarios.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_invitesController.js.html">controllers/invitesController.js</a>, <a href="controllers_invitesController.js.html#line129">line 129</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Throws:</h5>
-
-        
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        Devuelve el error
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">json</span>
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-
-    
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Devuelve OK, msg e invite, que es un json con la invitación creada
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">json</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~deleteInvite"><span class="type-signature">(async, inner) </span>deleteInvite<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Elimina una invitaciòn pasando el id.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>req</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Es el requerimiento que proviene de las rutas, en el 
-body debe tener '_id' con el id del usuario.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>res</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Es la respuesta que proviene de las rutas</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_invitesController.js.html">controllers/invitesController.js</a>, <a href="controllers_invitesController.js.html#line42">line 42</a>
+        <a href="controllers_othersControllers.js.html">controllers/othersControllers.js</a>, <a href="controllers_othersControllers.js.html#line72">line 72</a>
     </li></ul></dd>
     
 
@@ -537,7 +324,7 @@ body debe tener '_id' con el id del usuario.</td>
     
 
     
-    <h4 class="name" id="~getInvites"><span class="type-signature">(async, inner) </span>getInvites<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
+    <h4 class="name" id="~getChats"><span class="type-signature">(async, inner) </span>getChats<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
     
 
     
@@ -545,7 +332,7 @@ body debe tener '_id' con el id del usuario.</td>
 
 
 <div class="description">
-    Devuelve todas las invitaciones.
+    Devuelve todos los chats del usuario.
 </div>
 
 
@@ -597,7 +384,8 @@ body debe tener '_id' con el id del usuario.</td>
 
             
 
-            <td class="description last">Es el requerimiento que proviene de las rutas</td>
+            <td class="description last">Es el requerimiento que proviene de las rutas, en el 
+params debe tener '_id' con el id del usuario.</td>
         </tr>
 
     
@@ -661,7 +449,7 @@ body debe tener '_id' con el id del usuario.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_invitesController.js.html">controllers/invitesController.js</a>, <a href="controllers_invitesController.js.html#line88">line 88</a>
+        <a href="controllers_othersControllers.js.html">controllers/othersControllers.js</a>, <a href="controllers_othersControllers.js.html#line15">line 15</a>
     </li></ul></dd>
     
 
@@ -719,7 +507,7 @@ body debe tener '_id' con el id del usuario.</td>
 
         
 <div class="param-desc">
-    Devuelve OK, msg y data, que es un array con las invitaciones
+    Devuelve OK, msg y data, que es un array con los chats
 </div>
 
 
@@ -748,7 +536,7 @@ body debe tener '_id' con el id del usuario.</td>
     
 
     
-    <h4 class="name" id="~respondInvite"><span class="type-signature">(async, inner) </span>respondInvite<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
+    <h4 class="name" id="~getChats"><span class="type-signature">(async, inner) </span>getChats<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
     
 
     
@@ -756,7 +544,7 @@ body debe tener '_id' con el id del usuario.</td>
 
 
 <div class="description">
-    Da respuesta a una invitación.
+    Devuelve todos los mensajes del usuario
 </div>
 
 
@@ -808,9 +596,8 @@ body debe tener '_id' con el id del usuario.</td>
 
             
 
-            <td class="description last">Es el requerimiento que proviene de las rutas, debe contener
-en el body: sender, receiver, con los ids de los usuarios, _id: con el id de la invitación
-y accept: con la resolución de la invitación.</td>
+            <td class="description last">Es el requerimiento que proviene de las rutas, en el 
+params debe tener '_id' con el id del usuario.</td>
         </tr>
 
     
@@ -874,7 +661,7 @@ y accept: con la resolución de la invitación.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_invitesController.js.html">controllers/invitesController.js</a>, <a href="controllers_invitesController.js.html#line186">line 186</a>
+        <a href="controllers_othersControllers.js.html">controllers/othersControllers.js</a>, <a href="controllers_othersControllers.js.html#line125">line 125</a>
     </li></ul></dd>
     
 
@@ -932,7 +719,431 @@ y accept: con la resolución de la invitación.</td>
 
         
 <div class="param-desc">
-    Devuelve OK, msg e invite, que es un json con la invitación creada
+    Devuelve OK, msg y data, que es un array con los mensajes
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">json</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~getFriends"><span class="type-signature">(async, inner) </span>getFriends<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Devuelve todos los amigos del usuario
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Es el requerimiento que proviene de las rutas, en el 
+params debe tener '_id' con el id del usuario.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Es la respuesta que proviene de las rutas</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_othersControllers.js.html">controllers/othersControllers.js</a>, <a href="controllers_othersControllers.js.html#line176">line 176</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        Devuelve el error
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">json</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Devuelve OK, msg y data, que es un array con los amigos
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">json</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~updateUsersFriends"><span class="type-signature">(async, inner) </span>updateUsersFriends<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Elimina de la lista de amigos un usuario.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Es el requerimiento que proviene de las rutas, necesita en el
+body: _id y friendID</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Es la respuesta que proviene de las rutas</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_othersControllers.js.html">controllers/othersControllers.js</a>, <a href="controllers_othersControllers.js.html#line227">line 227</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        Devuelve el error
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">json</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Devuelve OK, msg y user, que es un json de tipo User
 </div>
 
 
@@ -958,580 +1169,6 @@ y accept: con la resolución de la invitación.</td>
         
     
 
-    
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-<h4 class="name" id="~Invite">Invite</h4>
-
-
-
-
-<div class="description">
-    Definición del tipo Invite
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>_id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">ID de la invitación</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sender</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">ID del usuario que envió la invitación</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>receiver</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">ID del usuario invitado</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>date</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Date</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">URL de la imagen del usuario</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_invitesController.js.html">controllers/invitesController.js</a>, <a href="controllers_invitesController.js.html#line31">line 31</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="~User">User</h4>
-
-
-
-
-<div class="description">
-    Definición del tipo User
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>_id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">ID del usuario</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>uid</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">UID del usuario generado por Firebase</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Nombre del usuario</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>email</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Email del usuario</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>image</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">URL de la imagen del usuario *</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>friends</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Lista de los ids de los amigos del usuario *</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>dateMod</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Date</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Fecha de modificación del perfil</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>profile</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Elementos de tipo ProfileElement, que componen el perfil</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>profileOrderIDs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">de los elementos que conforman el perfil en un orden específico</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>privateProfile</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Elementos de tipo ProfileElement, que componen el perfil privado</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>privateProfileOrder</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">IDs de los elementos que conforman el perfil en un orden específico privado</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>isAdmin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Valor que designa si un usuario es administrador</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_invitesController.js.html">controllers/invitesController.js</a>, <a href="controllers_invitesController.js.html#line13">line 13</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
     
 
     

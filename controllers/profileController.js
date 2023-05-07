@@ -225,7 +225,7 @@ const updateUsersProfile = async (req, res) => {
 
 /**
 * Actualiza el perfil privado del usuario
-* @method updateUsersProfile
+* @method updateUsersPrivateProfile
 * @async
 * @param {Object} req Es el requerimiento que proviene de las rutas, necesita en el
 body: _id, uid, profileOrder y todos los elementos que componen el perfil del usuario

@@ -98,17 +98,24 @@ const {
     getUsers,
     getUserByEmail,
 
-    getChats,
-
     loginUser,
-
-    updateUsersFriends,
 } = require('../controllers/usersController');
 
 
 const {
-    updateUsersProfile
-} = require('../controllers/profileController')
+    updateUsersProfile,
+    updateUsersPrivateProfile
+} = require('../controllers/profileController');
+
+
+
+const {
+    getChats,
+    getMsgs,
+    createMsg,
+    getFriends,
+    updateUsersFriends
+} = require('../controllers/othersControllers');
 
 
 const {
@@ -116,11 +123,12 @@ const {
     deleteInvite,
     getInvites,
     respondInvite
-} = require('../controllers/invitesController')
+} = require('../controllers/invitesController');
+
 
 
 /**
-* Ruta para devolver todos los chats de un usuarios
+* Ruta para devolver todos los chats de un usuario
 * @name (get)/chats/:
 * @function
 * @memberof module:routers/Users~routerUsers
@@ -131,13 +139,48 @@ router.get('/chats/:_id', getChats);
 
 
 /**
-* Ruta para devolver todos los chats de un usuarios
+* Ruta para crear un mensaje de un usuario a otro
+* @name (post)/msg
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {Object} body Debe contenter msg: el mensaje a enviar, from: ID del usuario
+que envia el mensaje e _id: el ID del usuario que recibirá el mensaje
+* @inner
+*/
+router.post('/msg', createMsg);
+
+
+/**
+* Ruta para devolver todos los mensajes de un usuario
+* @name (get)/msg/:
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} _id El ID del usuario
+* @inner
+*/
+router.get('/msg/:_id', getMsgs);
+
+
+/**
+* Ruta para devolver todos los amigos
+* @name (get)/friends/:
+* @function
+* @memberof module:routers/Users~routerUsers
+* @inner
+*/
+router.get('/friends/:_id', getFriends);
+
+
+
+/**
+* Ruta para devolver todos los usuarios
 * @name (get)/Users
 * @function
 * @memberof module:routers/Users~routerUsers
 * @inner
 */
 router.get('/', getUsers);
+
 
 
 /**
@@ -151,8 +194,9 @@ router.get('/', getUsers);
 router.get('/email/:email', getUserByEmail);
 
 
+
 /**
-* Ruta para actualizar el perfil del usuario
+* Ruta para actualizar el perfil privado del usuario
 * @name (put)/profile
 * @function
 * @memberof module:routers/Users~routerUsers
@@ -162,6 +206,21 @@ router.get('/email/:email', getUserByEmail);
 router.put('/profile', [
     uploadMulti
 ], updateUsersProfile);
+
+
+
+/**
+* Ruta para actualizar el perfil privado del usuario
+* @name (put)/privateProfile
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {Profile} profile [body] El perfil del usuario
+* @inner
+*/
+router.put('/privateprofile', [
+    uploadMulti
+], updateUsersPrivateProfile);
+
 
 
 /**
@@ -176,49 +235,6 @@ router.put('/profile', [
 router.put('/friends', updateUsersFriends);
 
 
-/**
-* Ruta para crear una invitación
-* @name (post)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @param {String} sender [body] El ID del usuario que envía la invitación
-* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
-* @inner
-*/
-router.post('/invite', createInvite);
-
-
-/**
-* Ruta para responder a una invitación
-* @name (put)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @param {String} sender [body] El ID del usuario que envía la invitación
-* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
-* @inner
-*/
-router.put('/invite', respondInvite);
-
-
-/**
-* Ruta para eliminar una invitación
-* @name (delete)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @param {String} _id [body] El ID de la invitación a eliminar
-* @inner
-*/
-router.delete('/invite', deleteInvite);
-
-
-/**
-* Ruta que devuelve todas las invitaciones activas
-* @name (get)/invite
-* @function
-* @memberof module:routers/Users~routerUsers
-* @inner
-*/
-router.get('/invite', getInvites);
 
 
 /**
@@ -238,6 +254,7 @@ router.post('/', [
 ], createUser);
 
 
+
 /**
 * Ruta para editar un usuario
 * @name (put)/
@@ -254,6 +271,7 @@ router.put('/', [
 ], updateUser);
 
 
+
 /**
 * Ruta para eliminar un usuario
 * @name (delete)/
@@ -263,6 +281,54 @@ router.put('/', [
 * @inner
 */
 router.delete('/', deleteUser);
+
+
+/**
+* Ruta para crear una invitación
+* @name (post)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} sender [body] El ID del usuario que envía la invitación
+* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
+* @inner
+*/
+router.post('/invite', createInvite);
+
+
+
+/**
+* Ruta para responder a una invitación
+* @name (put)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} sender [body] El ID del usuario que envía la invitación
+* @param {String} receiver [body] El ID del usuario que va a recibir la invitación
+* @inner
+*/
+router.put('/invite', respondInvite);
+
+
+
+/**
+* Ruta para eliminar una invitación
+* @name (delete)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @param {String} _id [body] El ID de la invitación a eliminar
+* @inner
+*/
+router.delete('/invite', deleteInvite);
+
+
+
+/**
+* Ruta que devuelve todas las invitaciones activas
+* @name (get)/invite
+* @function
+* @memberof module:routers/Users~routerUsers
+* @inner
+*/
+router.get('/invite', getInvites);
 
 
 router.post('/login', [
@@ -281,13 +347,13 @@ module.exports = router</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-chatModels.html">chatModels</a></li><li><a href="module-dbConnect.html">dbConnect</a></li><li><a href="module-invitesController.html">invitesController</a></li><li><a href="module-invitesModel.html">invitesModel</a></li><li><a href="module-profileController.html">profileController</a></li><li><a href="module-publicController.html">publicController</a></li><li><a href="module-routers_Public.html">routers/Public</a></li><li><a href="module-routers_Socket.html">routers/Socket</a></li><li><a href="module-routers_Users.html">routers/Users</a></li><li><a href="module-socketController.html">socketController</a></li><li><a href="module-uploadCloud.html">uploadCloud</a></li><li><a href="module-uploadImg.html">uploadImg</a></li><li><a href="module-usersController.html">usersController</a></li><li><a href="module-usersModel.html">usersModel</a></li><li><a href="module-validateInputs.html">validateInputs</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-routers_Public-routerPublic.html">routerPublic</a></li><li><a href="module-routers_Socket-routerSocket.html">routerSocket</a></li><li><a href="module-routers_Users-routerUsers.html">routerUsers</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-chatModels.html">chatModels</a></li><li><a href="module-dbConnect.html">dbConnect</a></li><li><a href="module-invitesController.html">invitesController</a></li><li><a href="module-invitesModel.html">invitesModel</a></li><li><a href="module-othersController.html">othersController</a></li><li><a href="module-profileController.html">profileController</a></li><li><a href="module-publicController.html">publicController</a></li><li><a href="module-routers_Public.html">routers/Public</a></li><li><a href="module-routers_Socket.html">routers/Socket</a></li><li><a href="module-routers_Users.html">routers/Users</a></li><li><a href="module-socketController.html">socketController</a></li><li><a href="module-uploadCloud.html">uploadCloud</a></li><li><a href="module-uploadImg.html">uploadImg</a></li><li><a href="module-usersController.html">usersController</a></li><li><a href="module-usersModel.html">usersModel</a></li><li><a href="module-validateInputs.html">validateInputs</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-routers_Public-routerPublic.html">routerPublic</a></li><li><a href="module-routers_Socket-routerSocket.html">routerSocket</a></li><li><a href="module-routers_Users-routerUsers.html">routerUsers</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat May 06 2023 15:41:04 GMT+0200 (hora de verano de Europa central)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun May 07 2023 21:19:15 GMT+0200 (hora de verano de Europa central)
 </footer>
 
 <script> prettyPrint(); </script>

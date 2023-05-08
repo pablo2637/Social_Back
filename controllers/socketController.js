@@ -200,9 +200,11 @@ const socketController = () => {
             // console.log(`SocketID: ${socket.id} joined room: ${data.name}`);
 
             const response = await createChat(data);
-            console.log('create response', response)
+            
+            const _id = response._id;
+            console.log('create response', _id)
             socket.emit('chatID', {
-                _id: response._id,
+                _id,
                 sender: data.sender,
                 receiver: data.receiver
             })
@@ -229,9 +231,15 @@ const socketController = () => {
         });
 
 
-        checkSockets();
+
+
 
     });
+
+    setInterval(() => {
+        checkSockets();
+
+    }, 5000);
 
 
 };
@@ -257,8 +265,11 @@ const checkSockets = () => {
                     soc.disconnect();
                     // console.log('soc disconnected:', soc.id)
 
-                } else
+                } else {
+                    console.log('interval', soc.id);
                     soc.emit('whoAreYou');
+                }
+
 
             } else {
                 socketsConnected.push({
@@ -267,6 +278,8 @@ const checkSockets = () => {
                     userID: ''
                 });
 
+
+                console.log('interval', soc.id);
                 soc.emit('whoAreYou');
             }
         } //else {

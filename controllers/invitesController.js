@@ -197,7 +197,7 @@ y accept: con la resolución de la invitación.
 const respondInvite = async ({ body }, res) => {
 
     try {
-
+        console.log('respond body', body)
         const response = true;
         const { accept, _id, sender, receiver } = body;
 
@@ -210,19 +210,21 @@ const respondInvite = async ({ body }, res) => {
                 msg: `No existe ninguna invitación con el ObjectId(${_id})`
             });
 
-        const friend1 = await User.findByIdAndUpdate(sender,
-            { $push: { friends: receiver } }, { new: true });
+        if (accept) {
+            const friend1 = await User.findByIdAndUpdate(sender,
+                { $push: { friends: receiver } }, { new: true });
 
-        const friend2 = await User.findByIdAndUpdate(receiver,
-            { $push: { friends: sender } }, { new: true });
+            const friend2 = await User.findByIdAndUpdate(receiver,
+                { $push: { friends: sender } }, { new: true });
 
-        if (!friend1 || !friend2)
-            return res.status(400).json({
-                ok: false,
-                msg: `Error al agregar el amigo`
-            });
+            if (!friend1 || !friend2)
+                return res.status(400).json({
+                    ok: false,
+                    msg: `Error al agregar el amigo`
+                });
+        }
 
-
+        console.log('toko ok', invite)
         execute({
             to: '1',
             command: ['invites', 'friends'],

@@ -186,7 +186,7 @@ params debe tener '_id' con el id del usuario.
 const getFriends = async ({ params }, res) => {
 
     try {
-
+console.log('params',params)
         const { _id } = params;
         if (_id == 'undefined')
             return res.status(404).json({

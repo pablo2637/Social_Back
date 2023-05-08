@@ -30,7 +30,7 @@ const User = require('../models/usersModel');
 
 
 /**
-* Devuelve todos los perfiles públicos de los usuarios.
+* Devuelve todos los perfiles de los usuarios.
 * @method getProfiles
 * @async
 * @param {Object} req Es el requerimiento que proviene de las rutas
@@ -42,7 +42,17 @@ const getProfiles = async (req, res) => {
 
     try {
 
-        const profiles = await User.find({ "isAdmin": false }, { name: 1, image: 1, email: 1, profile: 1, profileOrder: 1, dateMod: 1 }).sort({ dateMod: -1 });;
+        const profiles = await User.find({ "isAdmin": false }, {
+            name: 1,
+            image: 1,
+            email: 1,
+            profile: 1,
+            profileOrder: 1,
+            privateProfile: 1,
+            privateProfileOrder: 1,
+            privateDateMod: 1,
+            dateMod: 1
+        }).sort({ dateMod: -1 });;
 
         if (profiles.length == 0)
             return res.status(400).json({

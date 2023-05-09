@@ -184,7 +184,7 @@ const createUser = async (req, res) => {
 
         let urlPic;
         if (req.file)
-            urlPic = await uploadCloud(`./public/${req.file.filename}`, body.uid, 'Social');
+            urlPic = await uploadCloud(`/${req.file.filename}`, body.uid, 'Social');
 
         else
             urlPic = await uploadCloud(body.image, body.uid, 'Social');

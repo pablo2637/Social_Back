@@ -142,7 +142,7 @@ const updateUsersProfile = async (req, res) => {
         const arrayFiles = req.files || [];
 
         const { profile: arrayOK, upload } = checkAttachsFiles(arrayFiles, profile);
-     
+
 
         for (const key in arrayOK) {
             const tempKey = key.split('-');
@@ -159,7 +159,7 @@ const updateUsersProfile = async (req, res) => {
         if (arrayFiles) {
 
             for (let i = 0; i < arrayFiles.length; i++) {
-                urlPic = await uploadCloud(`${process.cwd()}/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
+                urlPic = await uploadCloud(`${req.destination}/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
                 newProfile.push({
                     content: urlPic,
                     typeInput: 'image',
@@ -191,7 +191,7 @@ const updateUsersProfile = async (req, res) => {
 
         if (arrayFiles) {
             for (let i = 0; i < arrayFiles.length; i++) {
-                await fs.unlink(`${process.cwd()}/${arrayFiles[i].filename}`);
+                await fs.unlink(`${req.destination}/${arrayFiles[i].filename}`);
             }
         }
 
@@ -247,7 +247,7 @@ const updateUsersPrivateProfile = async (req, res) => {
 
 
         const { profile: arrayOK, upload } = checkAttachsFiles(arrayFiles, privateProfile);
-        
+
         for (const key in arrayOK) {
             const tempKey = key.split('-');
             newProfile.push({
@@ -263,7 +263,7 @@ const updateUsersPrivateProfile = async (req, res) => {
         if (arrayFiles) {
 
             for (let i = 0; i < arrayFiles.length; i++) {
-                urlPic = await uploadCloud(`${process.cwd()}/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
+                urlPic = await uploadCloud(`${req.destination}/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
                 newProfile.push({
                     content: urlPic,
                     typeInput: 'image',
@@ -295,7 +295,7 @@ const updateUsersPrivateProfile = async (req, res) => {
 
         if (arrayFiles) {
             for (let i = 0; i < arrayFiles.length; i++) {
-                await fs.unlink(`${process.cwd()}/${arrayFiles[i].filename}`);
+                await fs.unlink(`${req.destination}/${arrayFiles[i].filename}`);
             }
         }
 

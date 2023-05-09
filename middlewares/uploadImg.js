@@ -18,8 +18,10 @@ const storage = multer.diskStorage({
      * @param {Object} file Son los datos para generar el archivo de imagen 
      * @param {Function} cb Función callback
      */
+
     destination: function (req, file, cb) {
         cb(null, `${process.cwd()}/`);
+        req.destination = `${process.cwd()}/`;
     },
 
     /**  

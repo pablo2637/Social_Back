@@ -133,16 +133,18 @@ const socketController = () => {
     io.on("connection", (socket) => {
 
 
-
+        /**
+         * Evento de conexión
+         */
         socket.on("connect", () => {
 
             const exists = getUserID(socket.id);
-            console.log('connect exists', exists)
+
             if (exists.ok)
                 return
 
             const ind = getSocketIndex(socket.id);
-            console.log('connect ind', ind)
+
             if (ind != -1)
                 return
 
@@ -152,30 +154,27 @@ const socketController = () => {
                 userID: ''
             })
 
-            console.log('connect: socketsConnected', socketsConnected)
+            console.log('connect: socketsConnected', socketsConnected);
         });
 
 
 
-
+        /**
+         * Cuando un usuario se desloguea
+         */
         socket.on("byeBye", () => {
 
             clearChatRooms(socket);
-
-            // socketsConnected.map(soc => soc.socketID == socket.id ? soc.userID = '' : soc.userID)
-
-            // console.log('User logout:', socketsConnected)
         });
 
 
 
-
+        /**
+         * El cliente envía una notificación con el id del usuario
+         */
         socket.on("whoAmI", async (data) => {
 
-            // console.log('wboAmI: data', data)
-            // const ind = socketsConnected.findIndex(user => user.socketID == socket.id)
             const ind = getSocketIndex(socket.id);
-            // console.log('wboAmI: ind', ind);
 
             if (ind.ok) {
 
@@ -210,9 +209,10 @@ const socketController = () => {
 
 
 
-
+        /**
+         * Se crea un nuevo chat room y se mete a los usuarios correspondientes dentro
+         */
         socket.on("newChat", async (data) => {
-            console.log('newChat: data', data)
 
             if (!data) {
                 socket.emit('NoChatData', data);
@@ -225,12 +225,11 @@ const socketController = () => {
                 receiver: data.receiver
             });
             socket.join(data.name);
-            // console.log(`SocketID: ${socket.id} joined room: ${data.name}`);
 
             const response = await createChat(data);
-            
+
             const _id = response._id;
-            console.log('create response', _id)
+
             socket.emit('chatID', {
                 _id,
                 sender: data.sender,
@@ -240,30 +239,31 @@ const socketController = () => {
 
 
 
+        /**
+         * Mensaje de chat recibido, se salva en la bd y se reenvía al destinatario
+         */
         socket.on("msgTo", async (data) => {
 
-            // console.log('msgTo mensaje', data)
             const response = await saveChat(data);
 
-            // console.log('msgTo response', response)
             socket.to(data.name).emit("msgFrom", data);
         });
 
 
 
-
+        /**
+         * El cliente se desconecta
+         */
         socket.on("disconnect", () => {
-            // console.log('disconnect: ', socket.id)
-
             clearChatRooms(socket);
         });
 
-
-
-
-
     });
 
+
+    /**
+     * Llama la función que comprueba los sockets conectados cada 10 segundos
+     */
     setInterval(() => {
         checkSockets();
 
@@ -274,27 +274,26 @@ const socketController = () => {
 
 
 
-
+/**
+ * Comprobación de sockets
+ */
 const checkSockets = () => {
 
     io.sockets.sockets.forEach(soc => {
 
         const user = getUserID(soc.id);
-        // console.log('checkSockets user', user)
 
         if (!user.ok) {
             const ind = getSocketIndex(soc.id);
-            // console.log('checkSockets, ind', ind, socketsConnected)
+
             if (ind.ok) {
                 socketsConnected[ind.index].reconnect += 1;
 
 
                 if (socketsConnected[ind.index].reconnect >= 3) {
                     soc.disconnect();
-                    // console.log('soc disconnected:', soc.id)
 
                 } else {
-                    console.log('interval', soc.id);
                     soc.emit('whoAreYou');
                 }
 
@@ -307,44 +306,32 @@ const checkSockets = () => {
                 });
 
 
-                console.log('interval', soc.id);
                 soc.emit('whoAreYou');
             }
-        } //else {
-
-        //     chatRooms.forEach(cr => {
-        //         if (cr.sender == user.userID || cr.receiver == user.userID)
-        //             soc.join(cr.name);
-
-        //     });
-        // }
-
-        // console.log('socket room', soc.id, soc.rooms)
+        }
     });
 
     joinRooms();
-    // }
-
 }
 
 
+
+/**
+ * Mete a los usuarios correspondientes dentro de los chat rooms que corresponda
+ */
 const joinRooms = () => {
-    // console.log('joinRooms: chatRooms', chatRooms);
+
     io.sockets.sockets.forEach(soc => {
 
         const user = getUserID(soc.id);
-        // console.log('joinRooms user', user)
 
         if (user.ok) {
 
             chatRooms.forEach(cr => {
-                // console.log('cr.sender == user.userID', cr.sender == user.userID);
-                // console.log('cr.receiver == user.userID', cr.receiver == user.userID);
 
-                if (cr.sender == user.userID || cr.receiver == user.userID) {
+                if (cr.sender == user.userID || cr.receiver == user.userID)
                     soc.join(cr.name);
-                    // console.log('join', soc.rooms)
-                }
+
 
             });
         }
@@ -353,6 +340,11 @@ const joinRooms = () => {
 };
 
 
+
+/**
+ * Limpiar los chatrooms
+ * @param {Object} socket 
+ */
 const clearChatRooms = (socket) => {
 
     const user = getUserID(socket.id);
@@ -363,7 +355,6 @@ const clearChatRooms = (socket) => {
         if (cr.name.includes(user.userID)) {
 
             socket.leave(cr.name);
-            // console.log('socket leaving:', cr.name)
 
             const otherUser = cr.name.replace(user.userID, '').replace('-', '');
             if (cr.name.includes(otherUser)) {
@@ -376,7 +367,6 @@ const clearChatRooms = (socket) => {
 
         }
     });
-    // console.log('erase', erase)
 
     for (let i = erase.length - 1; i >= 0; i--) {
         chatRooms.splice(erase[i], 1);
@@ -384,12 +374,17 @@ const clearChatRooms = (socket) => {
 
     socketsConnected.map(soc => soc.socketID == socket.id ? soc.userID = '' : soc.userID);
 
-
 };
 
 
 
-
+/**
+ * 
+ * @param {json} data El objeto para crear un chat nuevo, debe incluir: sender, receiver, que son los IDs
+ * correspondientes de los participantes, y name: el nombre del chat room
+ * @returns {json} Con la información del chat creado en la bd
+ * @throws {json} Error
+ */
 const createChat = async (data) => {
 
     try {
@@ -402,7 +397,6 @@ const createChat = async (data) => {
             ]
         });
 
-        // console.log('yaExiste', exists)
         if (exists)
             _id = exists._id;
 
@@ -557,8 +551,6 @@ const saveChat = async (data) => {
         if (!e.toString().includes('E11000'))
             console.log('saveChat error:', e);
 
-        console.log('e.tostring', e.toString.contains('e11000'))
-
         return {
             ok: false,
             msg: 'saveChat: Ha habido un fallo al guardar el chat.',
@@ -709,7 +701,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue May 09 2023 03:19:22 GMT+0200 (hora de verano de Europa central)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue May 09 2023 17:07:51 GMT+0200 (hora de verano de Europa central)
 </footer>
 
 <script> prettyPrint(); </script>

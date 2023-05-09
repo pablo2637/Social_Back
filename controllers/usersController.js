@@ -374,6 +374,9 @@ const deleteUser = async ({ body }, res) => {
 
 
 
+/**
+ * Deprecated...
+ */
 const loginUser = async ({ body }, res) => {
 
     try {

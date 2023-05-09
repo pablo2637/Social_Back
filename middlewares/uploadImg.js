@@ -29,10 +29,15 @@ const storage = multer.diskStorage({
      * @param {Function} cb Función callback
      */
     filename: function (req, file, cb) {
+        console.log('file', file);
         const extension = file.originalname.split('.');
-        const uniqueSuffix = `${Date.now()}.${extension[extension.length - 1]}`;
+        if (extension.length > 0) {
 
-        cb(null, uniqueSuffix);
+            const uniqueSuffix = `${Date.now()}.${extension[extension.length - 1]}`;
+            cb(null, uniqueSuffix);
+
+        } else
+            cb(null, Date.now());
     }
 });
 

@@ -113,6 +113,415 @@
     
 
     
+    <h4 class="name" id="~checkSockets"><span class="type-signature">(inner) </span>checkSockets<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Comprobación de sockets
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line252">line 252</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~clearChatRooms"><span class="type-signature">(inner) </span>clearChatRooms<span class="signature">(socket)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Limpiar los chatrooms
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>socket</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line320">line 320</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~createChat"><span class="type-signature">(async, inner) </span>createChat<span class="signature">(data)</span><span class="type-signature"> &rarr; {json}</span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">json</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">El objeto para crear un chat nuevo, debe incluir: sender, receiver, que son los IDscorrespondientes de los participantes, y name: el nombre del chat room</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line360">line 360</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        Error
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">json</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Con la información del chat creado en la bd
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">json</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="~execute"><span class="type-signature">(inner) </span>execute<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {json}</span></h4>
     
 
@@ -239,7 +648,7 @@ body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.<
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line595">line 595</a>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line587">line 587</a>
     </li></ul></dd>
     
 
@@ -452,7 +861,7 @@ body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.<
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line546">line 546</a>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line538">line 538</a>
     </li></ul></dd>
     
 
@@ -640,7 +1049,7 @@ body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.<
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line426">line 426</a>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line420">line 420</a>
     </li></ul></dd>
     
 
@@ -1291,6 +1700,94 @@ body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.<
     
 
     
+    <h4 class="name" id="~joinRooms"><span class="type-signature">(inner) </span>joinRooms<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Mete a los usuarios correspondientes dentro de los chat rooms que corresponda
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line294">line 294</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="~saveChat"><span class="type-signature">(async, inner) </span>saveChat<span class="signature">(data)</span><span class="type-signature"> &rarr; {json}</span></h4>
     
 
@@ -1392,7 +1889,7 @@ body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.<
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line477">line 477</a>
+        <a href="controllers_socketController.js.html">controllers/socketController.js</a>, <a href="controllers_socketController.js.html#line471">line 471</a>
     </li></ul></dd>
     
 
@@ -1751,7 +2248,7 @@ body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.<
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue May 09 2023 03:19:22 GMT+0200 (hora de verano de Europa central)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue May 09 2023 17:07:51 GMT+0200 (hora de verano de Europa central)
 </footer>
 
 <script> prettyPrint(); </script>

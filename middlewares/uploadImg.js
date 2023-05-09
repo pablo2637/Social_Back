@@ -22,6 +22,7 @@ const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, `${process.cwd()}/`);
         req.destination = `${process.cwd()}/`;
+        console.log('req destination', req.destination)
     },
 
     /**  

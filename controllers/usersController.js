@@ -170,7 +170,7 @@ body: uid, name, email, password e image.
 const createUser = async (req, res) => {
 
     try {
-
+        console.log('req destination', req.destination)
         const body = new Object(req.body);
 
         const yaExiste = await User.findOne({ "email": body.email });

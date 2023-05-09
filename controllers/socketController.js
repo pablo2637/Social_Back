@@ -214,10 +214,10 @@ const socketController = () => {
 
         socket.on("msgTo", async (data) => {
 
-            console.log('msgTo mensaje', data)
+            // console.log('msgTo mensaje', data)
             const response = await saveChat(data);
 
-            console.log('msgTo response', response)
+            // console.log('msgTo response', response)
             socket.to(data.name).emit("msgFrom", data);
         });
 
@@ -239,7 +239,7 @@ const socketController = () => {
     setInterval(() => {
         checkSockets();
 
-    }, 5000);
+    }, 10000);
 
 
 };
@@ -374,7 +374,7 @@ const createChat = async (data) => {
             ]
         });
 
-        console.log('yaExiste', exists)
+        // console.log('yaExiste', exists)
         if (exists)
             _id = exists._id;
 
@@ -477,7 +477,7 @@ const getChats = async (_id) => {
 const saveChat = async (data) => {
 
     try {
-        console.log('data', data)
+        // console.log('data', data)
         const { sender, receiver, _id, msg, date, msgSender } = data;
 
         let response;

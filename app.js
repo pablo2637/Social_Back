@@ -9,7 +9,6 @@ const { Server } = require("socket.io");
 const { connect } = require('./helpers/dbConnect');
 
 port = process.env.PORT;
-// chatPort = process.env.CHAT_PORT;
 
 app.use(cors());                                    //Cors
 app.use(express.static(__dirname + '/public'));     //Carpeta static
@@ -48,4 +47,4 @@ app.use((req, res) => { res.status(404).send({ msg: `Ruta no encontrada: ${req.u
 //Listener
 // app.listen(port, () => console.log(`AppServer listenning on port ${port}...`));
 
-server.listen(port, () => console.log(`ChatServer listenning on port ${port}...`));
+server.listen(port, () => console.log(`Server listenning on port ${port}...`));

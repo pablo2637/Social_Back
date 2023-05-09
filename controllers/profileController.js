@@ -159,7 +159,7 @@ const updateUsersProfile = async (req, res) => {
         if (arrayFiles) {
 
             for (let i = 0; i < arrayFiles.length; i++) {
-                urlPic = await uploadCloud(`./public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
+                urlPic = await uploadCloud(`${process.cwd()}/public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
                 newProfile.push({
                     content: urlPic,
                     typeInput: 'image',
@@ -191,7 +191,7 @@ const updateUsersProfile = async (req, res) => {
 
         if (arrayFiles) {
             for (let i = 0; i < arrayFiles.length; i++) {
-                await fs.unlink(`./public/${arrayFiles[i].filename}`);
+                await fs.unlink(`${process.cwd()}/public/${arrayFiles[i].filename}`);
             }
         }
 
@@ -263,7 +263,7 @@ const updateUsersPrivateProfile = async (req, res) => {
         if (arrayFiles) {
 
             for (let i = 0; i < arrayFiles.length; i++) {
-                urlPic = await uploadCloud(`./public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
+                urlPic = await uploadCloud(`${process.cwd()}/public/${arrayFiles[i].filename}`, i + body.uid, `Social/${body.uid}`);
                 newProfile.push({
                     content: urlPic,
                     typeInput: 'image',
@@ -295,7 +295,7 @@ const updateUsersPrivateProfile = async (req, res) => {
 
         if (arrayFiles) {
             for (let i = 0; i < arrayFiles.length; i++) {
-                await fs.unlink(`./public/${arrayFiles[i].filename}`);
+                await fs.unlink(`${process.cwd()}/public/${arrayFiles[i].filename}`);
             }
         }
 

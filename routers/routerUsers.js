@@ -122,6 +122,7 @@ que envia el mensaje e _id: el ID del usuario que recibirá el mensaje
 router.post('/msg', createMsg);
 
 
+
 /**
 * Ruta para devolver todos los mensajes de un usuario
 * @name (get)/msg/:
@@ -131,6 +132,7 @@ router.post('/msg', createMsg);
 * @inner
 */
 router.get('/msg/:_id', getMsgs);
+
 
 
 /**

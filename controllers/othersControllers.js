@@ -92,9 +92,20 @@ const createMsg = async ({ body }, res) => {
             msg,
             read: false
         }
-        console.log('update', update, _id)
-        const user = await User.findByIdAndUpdate(_id,
+
+        const updateReceiver = {
+            to: _id,
+            date: Date(),
+            msg,
+            read: false
+        }
+
+        // console.log('update', update, _id)
+        await User.findByIdAndUpdate(_id,
             { $push: { msgs: update } }, { new: true });
+
+        const response = await User.findByIdAndUpdate(from,
+            { $push: { msgs: updateReceiver } }, { new: true });
 
 
         execute({
@@ -105,7 +116,8 @@ const createMsg = async ({ body }, res) => {
 
         return res.status(201).json({
             ok: true,
-            msg: 'Mensaje creado con éxito'
+            msg: 'Mensaje creado con éxito',
+            data: response
         });
 
     } catch (e) {
@@ -186,7 +198,7 @@ params debe tener '_id' con el id del usuario.
 const getFriends = async ({ params }, res) => {
 
     try {
-console.log('params',params)
+        console.log('params', params)
         const { _id } = params;
         if (_id == 'undefined')
             return res.status(404).json({

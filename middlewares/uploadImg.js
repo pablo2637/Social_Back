@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
      * @param {Function} cb Función callback
      */
     destination: function (req, file, cb) {
-        cb(null, `${process.cwd()}/public/`);
+        cb(null, `${process.cwd()}/`);
     },
 
     /**  

@@ -184,7 +184,7 @@ const createUser = async (req, res) => {
 
         let urlPic;
         if (req.file)
-            urlPic = await uploadCloud(`${process.cwd()}/public/${req.file.filename}`, body.uid, 'Social');
+            urlPic = await uploadCloud(`${process.cwd()}/${req.file.filename}`, body.uid, 'Social');
 
         else
             urlPic = await uploadCloud(body.image, body.uid, 'Social');
@@ -200,7 +200,7 @@ const createUser = async (req, res) => {
         await user.save();
 
         if (req.file)
-            await fs.unlink(`${process.cwd()}/public/${req.file.filename}`);
+            await fs.unlink(`${process.cwd()}/${req.file.filename}`);
 
 
         execute({
@@ -249,7 +249,7 @@ const updateUser = async (req, res) => {
 
         let urlPic;
         if (req.file)
-            urlPic = await uploadCloud(`${process.cwd()}/public/${req.file.filename}`, uid, 'Social');
+            urlPic = await uploadCloud(`${process.cwd()}/${req.file.filename}`, uid, 'Social');
 
         else
             urlPic = await uploadCloud(imageURL, body.uid, 'Social');
@@ -267,7 +267,7 @@ const updateUser = async (req, res) => {
 
 
         if (req.file)
-            await fs.unlink(`${process.cwd()}/public/${req.file.filename}`);
+            await fs.unlink(`${process.cwd()}/${req.file.filename}`);
 
         execute({
             to: '-1',

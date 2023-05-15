@@ -84,12 +84,13 @@ const createMsg = async ({ body }, res) => {
 
     try {
 
-        const { _id, from, msg } = body;
+        const { _id, from, msg, isAdmin } = body;
 
         const update = {
             from,
             date: Date(),
             msg,
+            isAdmin,
             read: false
         }
 
@@ -97,6 +98,7 @@ const createMsg = async ({ body }, res) => {
             to: _id,
             date: Date(),
             msg,
+            isAdmin,
             read: false
         }
 

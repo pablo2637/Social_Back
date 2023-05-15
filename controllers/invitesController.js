@@ -53,18 +53,22 @@ const deleteInvite = async ({ body }, res) => {
 
     try {
         console.log('body', body)
-        const invite = await Invite.findByIdAndDelete(body._id);
+        const { _id, isAdmin } = body;
+        const invite = await Invite.findByIdAndDelete(_id);
         console.log('invite', invite)
         if (!invite)
             return res.status(400).json({
                 ok: false,
-                msg: `No existe ninguna invitación con el ObjectId(${body._id})`
+                msg: `No existe ninguna invitación con el ObjectId(${_id})`
             });
 
+        const to = isAdmin == true ? 'list' : '-1';
+        console.log('isAdmin', isAdmin)
         execute({
-            to: '-1',
+            to,
             command: ['invites'],
-            id: invite.sender
+            id: invite.sender,
+            ids: [invite.sender, invite.receiver]
         });
 
         return res.status(201).json({
@@ -139,7 +143,7 @@ en el body: sender y receiver, con los ids de los usuarios.
 const createInvite = async ({ body }, res) => {
 
     try {
-
+        console.log('body', body)
         const { sender, receiver } = body;
 
         const yaExiste = await Invite.findOne({
@@ -147,7 +151,7 @@ const createInvite = async ({ body }, res) => {
             "receiver": receiver,
             "response": false
         });
-
+        console.log('yaExiste', yaExiste)
         if (yaExiste)
             return res.status(200).json({
                 ok: true,
@@ -157,7 +161,8 @@ const createInvite = async ({ body }, res) => {
 
         const invite = new Invite({ sender, receiver });
 
-        await invite.save();
+        const ya = await invite.save();
+        console.log('ya', ya)
 
         execute({
             to: '1',

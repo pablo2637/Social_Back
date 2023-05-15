@@ -4,6 +4,7 @@ const { exists } = require('../models/usersModel');
 
 const socketsConnected = [];
 const chatRooms = [];
+const msgByeBye = 'byeBye';
 
 /** 
  * @author Pablo
@@ -43,6 +44,7 @@ const getSocketID = (userID) => {
     }
 
 };
+
 
 
 /**
@@ -94,6 +96,8 @@ const getSocketIndex = (socketID) => {
 
 };
 
+
+
 /**
 * Conjunto de métodos que procesan la información recibda a través del Chat Server
 * @method socketController
@@ -135,8 +139,8 @@ const socketController = () => {
          * Cuando un usuario se desloguea
          */
         socket.on("byeBye", () => {
-
             clearChatRooms(socket);
+            socket.emit('logout');
         });
 
 
@@ -145,35 +149,46 @@ const socketController = () => {
          * El cliente envía una notificación con el id del usuario
          */
         socket.on("whoAmI", async (data) => {
-
+            console.log('data', data)
             const ind = getSocketIndex(socket.id);
 
             if (ind.ok) {
+                if (data.userID) {
 
-                socketsConnected[ind.index].userID = data.userID;
-                socketsConnected[ind.index].reconnect = 0;
+                    socketsConnected[ind.index].userID = data?.userID;
+                    socketsConnected[ind.index].reconnect = 0;
+                    const userChats = await getChats(data.userID);
 
-                const userChats = await getChats(data.userID);
+                    if (userChats.ok) {
 
-                if (userChats.ok) {
+                        console.log('who am i', socket.id, data.userID);
+                        userChats.data.forEach(chat => {
 
-                    userChats.data.forEach(chat => {
+                            console.log('joining chat', chat.name);
+                            socket.join(chat.name);
+                            const exists = chatRooms.findIndex(cr => cr.name == chat.name);
 
-                        socket.join(chat.name);
-                        const exists = chatRooms.findIndex(cr => cr.name == chat.name);
+                            if (exists == -1) {
 
-                        if (exists == -1)
-                            chatRooms.push({
-                                name: chat.name,
-                                sender: chat.sender,
-                                receiver: chat.receiver
-                            });
+                                console.log('chatRoom add push', chat.name, chat.sender, chat.receiver);
+                                chatRooms.push({
+                                    name: chat.name,
+                                    sender: chat.sender,
+                                    receiver: chat.receiver
+                                });
+                            }
+                        });
 
-                    });
+                        joinRooms();
+                    }
 
-                    joinRooms();
+                } else {
+                    socketsConnected[ind.index].reconnect += 1;
+
+                    if (socketsConnected[ind.index].reconnect >= 5)
+                        socketsConnected[ind.index].userID = 'standingBy';
+
                 }
-
             } else
                 console.log('error whoAmI');
 
@@ -186,26 +201,36 @@ const socketController = () => {
          */
         socket.on("newChat", async (data) => {
 
+            console.log('newChat', data);
             if (!data) {
                 socket.emit('NoChatData', data);
                 return
             }
 
-            chatRooms.push({
-                name: data.name,
-                sender: data.sender,
-                receiver: data.receiver
-            });
-            socket.join(data.name);
 
             const response = await createChat(data);
+            console.log('newChat response', response)
+            if (!response.ok) return
 
-            const _id = response._id;
+            const exists = chatRooms.find(chat => chat._id == response.chat._id)
+            console.log('newChat exists', exists)
+            if (!exists)
+                chatRooms.push({
+                    name: response.chat.name,
+                    sender: response.chat.sender,
+                    receiver: response.chat.receiver,
+                    _id: response.chat._id
+                });
+
+            socket.join(response.chat.name);
+
+            // const _id = response._id;
 
             socket.emit('chatID', {
-                _id,
-                sender: data.sender,
-                receiver: data.receiver
+                chat: response.chat
+                // _id:response.chat,
+                // sender: data.sender,
+                // receiver: data.receiver
             })
         });
 
@@ -256,18 +281,18 @@ const checkSockets = () => {
         const user = getUserID(soc.id);
 
         if (!user.ok) {
+            console.log('reconnect');
             const ind = getSocketIndex(soc.id);
 
             if (ind.ok) {
-                socketsConnected[ind.index].reconnect += 1;
+                // socketsConnected[ind.index].reconnect += 1;
 
 
-                if (socketsConnected[ind.index].reconnect >= 3) {
-                    soc.disconnect();
+                // if (socketsConnected[ind.index].reconnect >= 3)
+                //     soc.disconnect();
 
-                } else {
-                    soc.emit('whoAreYou');
-                }
+                // else
+                soc.emit('whoAreYou');
 
 
             } else {
@@ -320,6 +345,7 @@ const joinRooms = () => {
 const clearChatRooms = (socket) => {
 
     const user = getUserID(socket.id);
+    console.log('user', user);
 
     const erase = [];
     chatRooms.forEach((cr, ind) => {
@@ -327,24 +353,32 @@ const clearChatRooms = (socket) => {
         if (cr.name.includes(user.userID)) {
 
             socket.leave(cr.name);
-
+            console.log('leaving', cr.name);
             const otherUser = cr.name.replace(user.userID, '').replace('-', '');
             if (cr.name.includes(otherUser)) {
 
                 const isConnected = getSocketID(otherUser);
-                if (isConnected.ok)
+                console.log('isConnected', isConnected);
+                if (!isConnected.ok)
                     erase.push(ind)
 
             }
 
         }
     });
-
+    console.log('erase', erase);
     for (let i = erase.length - 1; i >= 0; i--) {
         chatRooms.splice(erase[i], 1);
     };
 
-    socketsConnected.map(soc => soc.socketID == socket.id ? soc.userID = '' : soc.userID);
+    socketsConnected.map(soc => soc.socketID == socket.id ? soc.userID = msgByeBye : soc.userID);
+
+    for (let i = socketsConnected.length - 1; i >= 0; i--) {
+        if (socketsConnected[i].userID = msgByeBye)
+            socketsConnected.splice(i, 1);
+    };
+
+
 
 };
 
@@ -369,8 +403,10 @@ const createChat = async (data) => {
             ]
         });
 
+        let chatDef;
         if (exists)
-            _id = exists._id;
+            chatDef = exists;
+        // _id = exists._id;
 
         else {
             const newChat = new Chat({
@@ -387,7 +423,8 @@ const createChat = async (data) => {
                     newChat
                 }
 
-            _id = chat._id;
+            // _id = chat._id;      
+            chatDef = chat;
         }
 
         execute({
@@ -399,7 +436,7 @@ const createChat = async (data) => {
         return {
             ok: true,
             msg: 'Chat creado con éxito',
-            _id
+            chat: chatDef
         };
 
     } catch (e) {
@@ -460,6 +497,7 @@ const getChats = async (_id) => {
 
     };
 };
+
 
 
 /**
@@ -531,8 +569,8 @@ const saveChat = async (data) => {
 
     };
 
+};
 
-}
 
 
 /**
@@ -572,7 +610,18 @@ const executeEP = ({ body }, res) => {
             })
 
         io.to(response.socketID).emit('execute', order)
+    } else if (order.to == 'list') {
+
+        console.log('connected', socketsConnected);
+        console.log('order ids', order.ids)
+        const list = order.ids.map(id => socketsConnected.find(user => user.userID == id));
+        console.log('list', list)
+
+        list.forEach(soc => {
+            if (soc) io.to(soc.socketID).emit('execute', order);
+        });
     }
+
 
     res.status(200).json({
         ok: true,
@@ -582,6 +631,7 @@ const executeEP = ({ body }, res) => {
     });
 
 };
+
 
 
 /**
@@ -595,20 +645,18 @@ body debe tener 'order' que son las instrucciones a ejectuar, es de tipo Order.
 * @throws {json} Devuelve el error
 */
 const execute = (order) => {
+    console.log('order', order)
 
     if (order.to == 'all') {
 
-        io.emit('execute', order)
+        io.emit('execute', order);
 
     } else if (order.to == '-1') {
 
         const list = socketsConnected.filter(user => user.userID != order.id);
-        console.log('order', order)
-        console.log('list complete', socketsConnected);
-        console.log('list', list)
 
         list.forEach(soc => {
-            io.to(soc.socketID).emit('execute', order)
+            io.to(soc.socketID).emit('execute', order);
         });
 
     } else if (order.to == '1') {
@@ -616,9 +664,22 @@ const execute = (order) => {
         const response = getSocketID(order.id);
 
         if (!response.ok)
-            return response
+            return response;
 
-        io.to(response.socketID).emit('execute', order)
+        io.to(response.socketID).emit('execute', order);
+
+    } else if (order.to == 'list') {
+
+        console.log('connected', socketsConnected);
+        console.log('order ids', order.ids)
+        const list = order.ids.map(id => socketsConnected.find(user => user.userID == id));
+        console.log('list', list)
+
+        list.forEach(soc => {
+            if (soc) io.to(soc.socketID).emit('execute', order);
+        });
+
+
     }
 
 
